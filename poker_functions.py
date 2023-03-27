@@ -7,6 +7,19 @@ card_values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
 ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
 rank_value = dict(zip(ranks, card_values))
 suits = ['c', 'd', 'h', 's']
+outs = {'1':('46:1','45:1',"22:1"),
+        '2':('22:1','22:1','11:1'),
+        '3':('15:1', '14:1', '7:1'),
+        '4':('11:1','10:1','5:1'),
+        '5':('8.5:1', '8:1','4:1'),
+        '6':('7:1','7:1','3:1'),
+        '7':('6:1','6:1','2.5:1'),
+        '8':('5:1','5:1','2.5:1'),
+        '9':('4:1','4:1','2:1'),
+        '10':('3.5:1','3.5:1','1.5:1'),
+        '11':('3.3:1','3.2:1','1.5:1'),
+        '12':('3:1','3:1','1.2:1'),
+        }
 
 
 #####     POKER     #####
@@ -217,7 +230,7 @@ def simulation(hand, flop=[], turn=[], river=[], sims=100000):
             bar = parse_card(board_card)
             board.append(bar)
             deck = update_deck(deck, board_card)
-        j = full_board - passed_cards # number of cards to deal for full board
+        j = full_board - passed_cards # number of cards required to deal for full board
         for k in range(j): # Add additional cards to make a full board of 7
             deal, deck = deal_card(deck)
             board.append(deal)
@@ -262,5 +275,3 @@ def ratio(hits, sims):
     fraction = fraction.replace('/', ':')
     return fraction
 
-
-#####     DISPLAY     #####
