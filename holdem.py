@@ -21,7 +21,6 @@ if __name__ == '__main__':
 
     board = args.flop + args.turn + args.river
     check = board + args.Hole_Cards
-    # print(check)
     #  Check for dupes
     duplicate = p.dedupe(check)
     if duplicate:
