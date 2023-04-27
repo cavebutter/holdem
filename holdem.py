@@ -1,3 +1,5 @@
+import sys
+
 import poker_functions as p
 import argparse
 from prettytable import PrettyTable
@@ -18,6 +20,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     board = args.flop + args.turn + args.river
+    check = board + args.Hole_Cards
+    # print(check)
+    #  Check for dupes
+    duplicate = p.dedupe(check)
+    if duplicate:
+        print("There is a duplicate card.  Please check the board and your hand and try again")
+        sys.exit()
     board_str = ''
     for card in board:
         board_str += card + ' '

@@ -22,6 +22,19 @@ outs = {'1':('46:1','45:1',"22:1"),
         }
 
 
+def dedupe(board):
+    """Detect duplicate cards in a passed collection"""
+    unique_cards = []
+    duplicate = False
+    for card in board:
+        if card in unique_cards:
+            duplicate = True
+            return duplicate
+        else:
+            unique_cards.append(card)
+    return duplicate
+
+
 #####     POKER     #####
 class Card:
     def __init__(self, rank, suit):
