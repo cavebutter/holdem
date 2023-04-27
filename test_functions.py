@@ -55,6 +55,20 @@ flop9 = ['Jh', '3c', '3d']
 turn9 = ['4h']
 river9 = ['5s']
 
+#  Duplicated Card
+hand10 = ['3c', 'As']
+flop10 = ['3c', 'Jd', '9h']
+turn10 = ['4s']
+river10 = ['8s']
+
+
+#  Invalid Card
+hand11 = ['3c', 'As']
+flop11 = ['9c', 'Jd', '9h']
+turn11 = ['4s']
+river11 = ['Ss']
+
+
 def test_count_deck():
     """Test deck generates exactly 52 cards"""
     deck = p.generate_deck()
@@ -178,3 +192,26 @@ def test_straight_flush():
     board6 = flop6 + turn6 + river6
     straight_flush = p.find_straight_flush(hand6, board6)
     assert straight_flush
+
+def test_duplicate_card():
+    check = hand10 + flop10 + turn10 + river10
+    duplicate = p.dedupe(check)
+    assert duplicate
+
+
+def test_not_duplicate():
+    check = hand9 + flop9 + turn9 + river9
+    duplicate = p.dedupe(check)
+    assert not duplicate
+
+
+def test_not_valid():
+    check = hand11 + flop11 + turn11 + river11
+    valid = p.validate_card(check)
+    assert not valid
+
+
+def test_valid():
+    check = hand1 + flop1 + turn1 + river1
+    valid = p.validate_card(check)
+    assert valid

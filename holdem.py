@@ -20,12 +20,16 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     board = args.flop + args.turn + args.river
+    #  Validate arguments
     check = board + args.Hole_Cards
-    #  Check for dupes
     duplicate = p.dedupe(check)
     if duplicate:
         print("There is a duplicate card.  Please check the board and your hand and try again")
         sys.exit()
+    valid = p.validate_card(check)
+    if not valid:
+            print("At least one of your cards is not valid.  Please try again.")
+            sys.exit()
     board_str = ''
     for card in board:
         board_str += card + ' '

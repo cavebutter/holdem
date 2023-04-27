@@ -35,6 +35,18 @@ def dedupe(board):
     return duplicate
 
 
+def validate_card(check):
+    """Detect invalid cards in a passed collection"""
+    valid = True
+    deck = generate_deck()
+    valid_cards = [card.name for card in deck]
+    for card in check:
+        if card not in valid_cards:
+            valid = False
+            return valid
+    return valid
+
+
 #####     POKER     #####
 class Card:
     def __init__(self, rank, suit):
