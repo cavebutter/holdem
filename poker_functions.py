@@ -4,6 +4,7 @@ from fractions import Fraction
 from dataclasses import dataclass
 from collections import UserList
 
+import poker_functions
 
 card_values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
 ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
@@ -37,16 +38,16 @@ def dedupe(board):
     return duplicate
 
 
-# def validate_card(check):
-#     """Detect invalid cards in a passed collection"""
-#     valid = True
-#     deck = generate_deck()
-#     valid_cards = [card.name for card in deck]
-#     for card in check:
-#         if card not in valid_cards:
-#             valid = False
-#             return valid
-#     return valid
+def validate_card(check):
+    """Detect invalid cards in a passed collection"""
+    valid = True
+    deck = generate_deck()
+    valid_cards = [card.name for card in deck]
+    for card in check:
+        if card not in valid_cards:
+            valid = False
+            return valid
+    return valid
 
 
 #####     POKER     #####
@@ -62,41 +63,63 @@ class Card:
         return self.name
 
 
-class Deck(object):
-    def __init__(self):
-        self = []
+    def __getitem__(self, item):
+        if item == 'rank':
+            return self.rank
+        elif item == 'suit':
+            return self.suit
+        elif item == 'name':
+            return self.name
+        elif item == 'value':
+            return self.value
 
 
-    def __new__(cls):
-        card_values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-        ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
-        rank_value = dict(zip(ranks, card_values))
-        suits = ['c', 'd', 'h', 's']
-        deck = []
-        for rank in ranks:
-            for suit in suits:
-                card_str = rank + suit
-                _card = Card(card_str)
-                deck.append(_card)
-        return super(Deck, cls).__new__(cls)
+def generate_deck():
+    card_values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+    ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
+    rank_value = dict(zip(ranks, card_values))
+    suits = ['c', 'd', 'h', 's']
+    deck = []
+    for rank in ranks:
+        for suit in suits:
+            card_str = rank + suit
+            _card = Card(card_str)
+            deck.append(_card)
+    deck = Deck(deck)
+    return deck
+
+
+class Deck(list):
+    def __init__(self, deck):
+        self.deck = deck
+
+    def __getitem__(self, item):
+        return self.deck[item]
+
+    def __iter__(self):
+        for elem in self.deck:
+            yield elem
+
+    def __len__(self):
+        return len(self.deck)
 
     def deal_card(self):
-        """Deals random card from deck, removes that card from deck.
-        Returns that card and the deck."""
+        """Select a random card from the deck"""
         i = random.randint(0, len(self)-1)
         card = self[i]
-        self.pop(i)
+        self.deck.pop(i)
         return card, self
 
     def update_deck(self, card):
         """Remove card from deck"""
-        passed_card = Card(card)
+        if isinstance(card, poker_functions.Card):
+            card_name = card.name
+        else:
+            card_name = card
         for item in self:
-            if passed_card.name == item.name:
-                self.remove(item)
+            if card_name == item.name:
+                self.deck.remove(item)
         return self
-
-
 
 
 # def convert_total_hand(total_hand):
