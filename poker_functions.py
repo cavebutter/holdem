@@ -122,147 +122,108 @@ class Deck(list):
         return self
 
 
-# def convert_total_hand(total_hand):
-#     """Takes a list of either strings or Card abjects.  If strings, convert to Cards.  If Cards return Cards."""
-#     if type(total_hand[0]) == str:  # The check for Card type was not preventing errors when passed Cards, so added another check to parse_card
-#         total_hand = [parse_card(card) for card in total_hand]
-#         return total_hand
-#
-#     else:
-#         return total_hand
-#
-# def find_flush(hand, board):
-#     """Does any combination of 5 cards in hand or on board amount to 5 of the same suit"""
-#     total_hand = hand + board
-#     total_hand = convert_total_hand(total_hand)
-#     flush = False
-#     c_count = 0
-#     d_count = 0
-#     h_count = 0
-#     s_count = 0
-#     for card in total_hand:  #  TODO is there a more elegant way to do this?
-#         if card.suit == 'c':
-#             c_count += 1
-#         elif card.suit == 'd':
-#             d_count += 1
-#         elif card.suit == 'h':
-#             h_count += 1
-#         elif card.suit == 's':
-#             s_count += 1
-#     suits = [c_count, d_count, h_count, s_count]
-#     for suit in suits:
-#         if suit >= 5:
-#             flush = True
-#             return flush
-#     return flush
-#
-# def find_multiple(hand, board, n=2):
-#     """Is there a pair?"""
-#     multiple = False
-#     total_hand = hand + board
-#     total_hand = convert_total_hand(total_hand)
-#     values = [card.value for card in total_hand]
-#     c = Counter(values)
-#     for value in values:
-#         if c[value] == n:
-#             multiple = True
-#             return multiple
-#     return multiple
-#
-# def find_two_pair(hand, board):
-#     """Is there two-pair?"""
-#     #  TODO This function is not DRY
-#     two_pair = False
-#     total_hand = hand + board
-#     total_hand = convert_total_hand(total_hand)
-#     values = [card.value for card in total_hand]
-#     c = Counter(values)
-#     for value in values:
-#         if c[value] > 1:
-#             c.pop(value)
-#             for value in values:
-#                 if c[value] > 1:
-#                     two_pair = True
-#                     return two_pair
-#     return two_pair
-#
-# def find_full_house(hand, board):
-#     """Is there a full house?"""
-#     # Find 3 of a kind
-#     boat = False
-#     total_hand = hand + board
-#     total_hand = convert_total_hand(total_hand)
-#     values = [card.value for card in total_hand]
-#     c = Counter(values)
-#     for value in values:
-#         if c[value] == 3:
-#             c.pop(value)
-#             for value in values:
-#                 if c[value] > 1:
-#                     boat = True
-#                     return boat
-#     return boat
-#
-# def evaluate_straight(five_cards):
-#     straight = (max(five_cards) - min(five_cards) + 1) == len(five_cards)
-#     return straight
-#
-#
-# def find_straight(hand, board):
-#     #  OMG THIS IS SO UGLY
-#     straight = False
-#     reqd_hand_size = 5
-#     total_hand = hand + board
-#     total_hand = convert_total_hand(total_hand)
-#     values = [card.value for card in total_hand]
-#     total_hand = set(values)  # remove pairs
-#     values = [item for item in total_hand] # ordered list with pairs removed
-#     slices = len(values) - reqd_hand_size
-#     if slices < 0: # Is there a way to iterate rather than if-elif?  Should I?
-#         straight = False
-#         return straight
-#     elif slices == 0:
-#         straight = evaluate_straight(values)
-#         return straight
-#     elif slices == 1:
-#         list1 = values[0:4]
-#         list2 = values[1:5]
-#         combos = [list1, list2]
-#         for combo in combos:
-#             straight = evaluate_straight(combo)
-#             if straight:
-#                 return straight
-#     elif slices == 2:
-#         list1 = values[0:5]
-#         list2 = values[1:6]
-#         list3 = values[2:]
-#         combos = [list1, list2, list3]
-#         for combo in combos:
-#             straight = evaluate_straight(combo)
-#             if straight:
-#                 return straight
-#     return straight
-#
-#
-# def find_straight_flush(hand, board):
-#     straight_flush = False
-#     flush = find_flush(hand, board)
-#     if flush:
-#         total_hand = hand + board
-#         total_hand = convert_total_hand(total_hand)
-#         suits = [card.suit for card in total_hand]
-#         c = Counter(suits)
-#         flush_suit = c.most_common(1)
-#         flush_suit = flush_suit[0][0][0]
-#         flush_hand = [card for card in total_hand if card.suit == flush_suit]
-#         straight = find_straight(flush_hand, board=[])
-#         if straight:
-#             straight_flush = True
-#             return straight_flush
-#     return straight_flush
-#
-#
-#
+def find_flush(hand, board):
+    """Does any combination of 5 cards in hand or on board amount to 5 of the same suit"""
+    total_hand = hand + board
+    total_hand_suits = [Card(card).suit for card in total_hand]
+    flush = False
+    c = Counter(total_hand_suits)
+    for suit in total_hand_suits:
+        if c[suit] >= 5:
+            flush = True
+            return flush
+    return flush
+
+
+def find_multiple(hand, board, n=2):
+    """Is there a pair?"""
+    multiple = False
+    total_hand = hand + board
+    total_hand = [Card(card) for card in total_hand]
+    values = [card.value for card in total_hand]
+    c = Counter(values)
+    for value in values:
+        if c[value] == n:
+            multiple = True
+            return multiple
+    return multiple
+
+def find_two_pair(hand, board):
+    """Is there two-pair?"""
+    two_pair = False
+    total_hand = hand + board
+    values = [Card(card).value for card in total_hand]
+    c = Counter(values)
+    for value in values:
+        if c[value] > 1:
+            c.pop(value)
+            for value in values:
+                if c[value] > 1:
+                    two_pair = True
+                    return two_pair
+    return two_pair
+
+
+def find_full_house(hand, board):
+    """Is there a full house?"""
+    boat = False
+    total_hand = hand + board
+    values = [Card(card).value for card in total_hand]
+    c = Counter(values)
+    for value in values:
+        if c[value] == 3: # This looks overly indented but should offer early exit if there is no 3OK
+            c.pop(value)
+            for value in values:
+                if c[value] > 1:
+                    boat = True
+                    return boat
+    return boat
+
+
+def find_straight(hand, board):
+    straight = False
+    reqd_hand_size = 5  # required hand size gives us some flexibility at the cost of more lines.  could be more efficient if we say 'if len(values)<5'
+    total_hand = hand + board
+    values = [*set(Card(card).value for card in total_hand)]
+    if 14 in values:
+        values.append(1)  # Allows for low straight
+    values.sort()
+    slices = len(values) - reqd_hand_size
+    if slices < 0:
+        return straight
+    else:
+        count = 0
+        for rank in (14, *range(2, 15)):
+            if rank in values:
+                count += 1
+                if count == 5:
+                    straight = True
+                    return straight
+            else:
+                count = 0
+        return straight
+
+
+
+def find_straight_flush(hand, board):
+    straight_flush = False
+    flush = find_flush(hand, board)
+    if flush:
+        total_hand = hand + board
+        total_hand = [Card(card) for card in total_hand]
+        suits = [Card(card).suit for card in total_hand]
+        c = Counter(suits)
+        flush_suit = c.most_common(1)
+        flush_suit = flush_suit[0][0][0]
+        flush_hand = [card for card in total_hand if card.suit == flush_suit]
+        straight = find_straight(flush_hand, board=[])
+        if straight:
+            straight_flush = True
+            return straight_flush
+    return straight_flush
+
+
+
 # #####     SIMULATION     #####
 # def simulation(hand, flop=[], turn=[], river=[], sims=100000):
 #     passed_board = flop + turn + river

@@ -2,7 +2,7 @@
 
 Command line application (for now).  There are two flows:
 * Simple Outs and Odds
-* Monte Carlo Simulation with Percentages and Odds for a Given Hand/Board Comnination
+* Monte Carlo Simulation with Percentages and Odds for a Given Hand/Board combination
 
 ## Outs and Odds
 Tell the application the number of outs you have to improve your hand, and the application will return the odds of

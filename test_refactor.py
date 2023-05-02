@@ -56,7 +56,7 @@ river8 = ['5s']
 
 # Straight, 6 card
 hand9 = ['2c', '7s']
-flop9 = ['Jh', '3c', '3d']
+flop9 = ['Jh', '3c', '6d']
 turn9 = ['4h']
 river9 = ['5s']
 
@@ -72,6 +72,13 @@ hand11 = ['3c', 'As']
 flop11 = ['9c', 'Jd', '9h']
 turn11 = ['4s']
 river11 = ['Ss']
+
+
+#  Wheel
+hand12 = ['Ac', 'Td']
+flop12 = ['2c', '3h', 'Qs']
+turn12 = ['4s']
+river12 = ['5d']
 
 def test_card_init():
     card = p.Card(card_str1)
@@ -120,6 +127,13 @@ def test_deal_card_1():
     assert type(card) == p.Card
 
 
+def test_deal_card_2():
+    """Ensures that deal_card removes Card from deck"""
+    deck = p.generate_deck()
+    card, deck = deck.deal_card()
+    assert len(deck) == 51
+
+
 def test_update_deck_1():
     """Remove a passed card from Deck"""
     deck = p.generate_deck()
@@ -137,3 +151,106 @@ def test_invalid_card():
     check = hand11 + flop11 + turn11 + river11
     valid = p.validate_card(check)
     assert not valid
+
+
+def test_duplicate_card():
+    check = hand10 + flop10 + turn10 + river10
+    duplicate = p.dedupe(check)
+    assert duplicate
+
+
+def test_not_duplicate():
+    check = hand9 + flop9 + turn9 + river9
+    duplicate = p.dedupe(check)
+    assert not duplicate
+
+
+def test_no_flush():
+    board = flop1 + turn1 + river1
+    flush = p.find_flush(hand1, board)
+    assert not flush
+
+def test_flush():
+    board2 = flop2 + turn2 + river2
+    flush = p.find_flush(hand2, board2)
+    assert flush
+
+
+def test_one_pair():
+    board2 = flop2 + turn2 + river2
+    pair = p.find_multiple(hand2, board2)
+    assert pair
+
+def test_not_one_pair():
+    board3 = flop3 + turn3 + river3
+    pair = p.find_multiple(hand3, board3)
+    assert not pair
+
+def test_not_two_pair():
+    board3 = flop3 + turn3 + river3
+    two_pair = p.find_two_pair(hand3, board3)
+    assert not two_pair
+
+def test_two_pair():
+    board1 = flop1 + turn1 + river1
+    two_pair = p.find_two_pair(hand1, board1)
+    assert two_pair
+
+def test_not_3ok():
+    board1 = flop1 + turn1 + river1
+    three_o_kind = p.find_multiple(hand1, board1, 3)
+    assert not three_o_kind
+
+def test_3ok():
+    board4 = flop4 + turn4 + river4
+    three_o_kind = p.find_multiple(hand4, board4, 3)
+    assert three_o_kind
+
+
+def test_straight_sequential():
+    board3 = flop3 + turn3 + river3
+    straight = p.find_straight(hand3, board3)
+    assert straight
+
+def test_straight_non_sequential():
+    board7 = flop7 + turn7 + river7
+    straight = p.find_straight(hand7, board7)
+    assert straight
+
+def test_straight_5_card():
+    board8 = flop8 + turn8 + river8
+    straight = p.find_straight(hand8, board8)
+    assert straight
+
+def test_straight_6_card():
+    board9 = flop9 + turn9 + river9
+    straight = p.find_straight(hand9, board9)
+    assert straight
+
+def test_not_straight():
+    board4 = flop4 + turn4 + river4
+    straight = p.find_straight(hand4, board4)
+    assert not straight
+
+
+def test_straight_wheel():
+    board12 = flop12 + turn12 + river12
+    straight = p.find_straight(hand12, board12)
+    assert straight
+
+
+def test_not_straight_flush():
+    board = flop1 + turn1 + river1
+    straight_flush = p.find_straight_flush(hand1, board)
+    assert not straight_flush
+
+def test_not_straight_flush_flush():
+    board = flop2 + turn2 + river2
+    straight_flush = p.find_straight_flush(hand2, board)
+    assert not straight_flush
+
+
+def test_straight_flush():
+    board6 = flop6 + turn6 + river6
+    straight_flush = p.find_straight_flush(hand6, board6)
+    assert straight_flush
