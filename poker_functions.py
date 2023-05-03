@@ -1,8 +1,7 @@
 import random
-from collections import Counter
+from collections import Counter, UserList
 from fractions import Fraction
 from dataclasses import dataclass
-from collections import UserList
 
 import poker_functions
 
@@ -26,15 +25,12 @@ outs = {'1':('46:1','45:1',"22:1"),
 
 
 def dedupe(board):
-    """Detect duplicate cards in a passed collection"""
-    unique_cards = []
     duplicate = False
+    c = Counter(board)
     for card in board:
-        if card in unique_cards:
+        if c[card] > 1:
             duplicate = True
             return duplicate
-        else:
-            unique_cards.append(card)
     return duplicate
 
 
@@ -148,6 +144,7 @@ def find_multiple(hand, board, n=2):
             return multiple
     return multiple
 
+
 def find_two_pair(hand, board):
     """Is there two-pair?"""
     two_pair = False
@@ -180,6 +177,21 @@ def find_full_house(hand, board):
     return boat
 
 
+
+def evaluate_straight(values):
+    straight = False
+    count = 0
+    for rank in (14, *range(2, 15)):
+        if rank in values:
+            count += 1
+            if count == 5:
+                straight = True
+                return straight
+        else:
+            count = 0
+    return straight
+
+
 def find_straight(hand, board):
     straight = False
     reqd_hand_size = 5  # required hand size gives us some flexibility at the cost of more lines.  could be more efficient if we say 'if len(values)<5'
@@ -192,35 +204,22 @@ def find_straight(hand, board):
     if slices < 0:
         return straight
     else:
-        count = 0
-        for rank in (14, *range(2, 15)):
-            if rank in values:
-                count += 1
-                if count == 5:
-                    straight = True
-                    return straight
-            else:
-                count = 0
+        straight = evaluate_straight(values)
         return straight
 
 
-
 def find_straight_flush(hand, board):
-    straight_flush = False
     flush = find_flush(hand, board)
     if flush:
         total_hand = hand + board
         total_hand = [Card(card) for card in total_hand]
-        suits = [Card(card).suit for card in total_hand]
-        c = Counter(suits)
-        flush_suit = c.most_common(1)
-        flush_suit = flush_suit[0][0][0]
-        flush_hand = [card for card in total_hand if card.suit == flush_suit]
-        straight = find_straight(flush_hand, board=[])
-        if straight:
-            straight_flush = True
-            return straight_flush
-    return straight_flush
+        hand_suits = [card.suit for card in total_hand]
+        c = Counter(hand_suits)
+        flush_suit = c.most_common(1)[0][0]
+        flush_hand = [card.value for card in total_hand if card.suit == flush_suit]
+        straight_flush = evaluate_straight(flush_hand)
+        return straight_flush
+
 
 
 

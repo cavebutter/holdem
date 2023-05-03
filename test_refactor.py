@@ -40,7 +40,7 @@ river5 = ['Ad']
 hand6 = ['4s', '5s']
 flop6 = ['6s', '7s', '8s']
 turn6 = ['Jc']
-river6 = ['As']
+river6 = ['Ac']
 
 # Straight, non-sequential
 hand7 = ['2c', '9s']
@@ -251,6 +251,6 @@ def test_not_straight_flush_flush():
 
 
 def test_straight_flush():
-    board6 = flop6 + turn6 + river6
-    straight_flush = p.find_straight_flush(hand6, board6)
+    board = flop6 + turn6 + river6
+    straight_flush = p.find_straight_flush(hand6, board)
     assert straight_flush
