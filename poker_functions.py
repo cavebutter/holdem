@@ -1,9 +1,6 @@
 import random
-from collections import Counter, UserList
-from fractions import Fraction
+from collections import Counter
 from dataclasses import dataclass
-
-import poker_functions
 
 card_values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
 ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
@@ -71,10 +68,6 @@ class Card:
 
 
 def generate_deck():
-    card_values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-    ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
-    rank_value = dict(zip(ranks, card_values))
-    suits = ['c', 'd', 'h', 's']
     deck = []
     for rank in ranks:
         for suit in suits:
@@ -108,7 +101,7 @@ class Deck(list):
 
     def update_deck(self, card):
         """Remove card from deck"""
-        if isinstance(card, poker_functions.Card):
+        if isinstance(card, Card):
             card_name = card.name
         else:
             card_name = card
@@ -132,7 +125,7 @@ def find_flush(hand, board):
 
 
 def find_multiple(hand, board, n=2):
-    """Is there a pair?"""
+    """Is there a pair, three of a kind, four of a kind/?"""
     multiple = False
     total_hand = hand + board
     total_hand = [Card(card) for card in total_hand]
@@ -177,8 +170,8 @@ def find_full_house(hand, board):
     return boat
 
 
-
 def evaluate_straight(values):
+    """Evaluates a list of card values to determine whether there are 5 consecutive values"""
     straight = False
     count = 0
     for rank in (14, *range(2, 15)):
@@ -193,6 +186,7 @@ def evaluate_straight(values):
 
 
 def find_straight(hand, board):
+    """Find a straight in a given hand/board combination"""
     straight = False
     reqd_hand_size = 5  # required hand size gives us some flexibility at the cost of more lines.  could be more efficient if we say 'if len(values)<5'
     total_hand = hand + board
@@ -209,6 +203,7 @@ def find_straight(hand, board):
 
 
 def find_straight_flush(hand, board):
+    """Find a straight flush in a given hand/board combination"""
     flush = find_flush(hand, board)
     if flush:
         total_hand = hand + board
@@ -219,77 +214,4 @@ def find_straight_flush(hand, board):
         flush_hand = [card.value for card in total_hand if card.suit == flush_suit]
         straight_flush = evaluate_straight(flush_hand)
         return straight_flush
-
-
-
-
-# #####     SIMULATION     #####
-# def simulation(hand, flop=[], turn=[], river=[], sims=100000):
-#     passed_board = flop + turn + river
-#     full_board = 7 # number of cards required to run a sim
-#     passed_cards = len(hand) + len(passed_board)
-#     pairs = 0
-#     two_pairs = 0
-#     trips = 0
-#     straights = 0
-#     flushes = 0
-#     boats = 0
-#     quads = 0
-#     straight_flushes = 0
-#     for i in range(sims):
-#         deck = generate_deck()
-#         hole_cards = []
-#         board = []
-#         for hole_card in hand: #  Add hole cards to total hand
-#             foo = parse_card(hole_card)
-#             hole_cards.append(foo)
-#             deck = update_deck(deck, hole_card)
-#         for board_card in passed_board: #  Add board cards to total hand
-#             bar = parse_card(board_card)
-#             board.append(bar)
-#             deck = update_deck(deck, board_card)
-#         j = full_board - passed_cards # number of cards required to deal for full board
-#         for k in range(j): # Add additional cards to make a full board of 7
-#             deal, deck = deal_card(deck)
-#             board.append(deal)
-#         straight_flush = find_straight_flush(hand, board)
-#         if straight_flush:
-#             straight_flushes += 1
-#             continue
-#         elif find_multiple(hand, board, 4):
-#             quads += 1
-#             continue
-#         elif find_full_house(hand, board):
-#             boats += 1
-#             continue
-#         elif find_flush(hand, board):
-#             flushes += 1
-#             continue
-#         elif find_straight(hand, board):
-#             straights += 1
-#             continue
-#         elif find_multiple(hand, board, 3):
-#             trips += 1
-#             continue
-#         elif find_two_pair(hand, board):
-#             two_pairs += 1
-#             continue
-#         elif find_multiple(hand, board):
-#             pairs += 1
-#             continue
-#         i += 1
-#     return sims, pairs, two_pairs, trips, straights, flushes, boats, quads, straight_flushes
-#
-#
-# #####     MATH     #####
-# def percent(hits, sims):
-#     percent = round((hits / sims) * 100,0)
-#     return percent
-#
-# def ratio(hits, sims):
-#     """Return a ratio (e.g. 3:5) for two input numbers"""
-#     percent = round((hits / sims),2)
-#     fraction = str(Fraction(percent).limit_denominator())
-#     fraction = fraction.replace('/', ':')
-#     return fraction
 

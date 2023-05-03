@@ -135,11 +135,38 @@ def test_deal_card_2():
 
 
 def test_update_deck_1():
-    """Remove a passed card from Deck"""
+    """Remove a passed card from Deck passed as string"""
     deck = p.generate_deck()
     deck.update_deck('Ks')
     cards = [card.name for card in deck]
     assert len(deck) == 51
+
+
+def test_update_deck_2():
+    """Remove a passed card from Deck passed as Card"""
+    card = p.Card('Ks')
+    deck = p.generate_deck()
+    deck.update_deck(card)
+    cards = [card.name for card in deck]
+    assert len(deck) == 51
+
+
+def test_update_deck_3():
+    """Ensure specific passed card is removed from deck"""
+    passed_card = p.Card('2c')
+    deck = p.generate_deck()
+    deck.update_deck(passed_card)
+    cards = [card.name for card in deck]
+    assert passed_card.name not in cards
+
+
+def test_update_deck_4():
+    """Ensure specific passed card string is removed from deck"""
+    passed_card = '2c'
+    deck = p.generate_deck()
+    deck.update_deck(passed_card)
+    cards = [card.name for card in deck]
+    assert passed_card.name not in cards
 
 def test_valid_card():
     check = hand9 + flop9 + turn9 + river9
