@@ -168,28 +168,9 @@ def test_update_deck_4():
     cards = [card.name for card in deck]
     assert passed_card not in cards
 
-def test_valid_card():
-    check = hand9 + flop9 + turn9 + river9
-    valid = p.validate_card(check)
-    assert valid
 
 
-def test_invalid_card():
-    check = hand11 + flop11 + turn11 + river11
-    valid = p.validate_card(check)
-    assert not valid
 
-
-def test_duplicate_card():
-    check = hand10 + flop10 + turn10 + river10
-    duplicate = p.dedupe(check)
-    assert duplicate
-
-
-def test_not_duplicate():
-    check = hand9 + flop9 + turn9 + river9
-    duplicate = p.dedupe(check)
-    assert not duplicate
 
 
 def test_no_flush():

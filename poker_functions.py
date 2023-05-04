@@ -6,41 +6,10 @@ card_values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
 ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
 rank_value = dict(zip(ranks, card_values))
 suits = ['c', 'd', 'h', 's']
-outs = {'1':('46:1','45:1',"22:1"),
-        '2':('22:1','22:1','11:1'),
-        '3':('15:1', '14:1', '7:1'),
-        '4':('11:1','10:1','5:1'),
-        '5':('8.5:1', '8:1','4:1'),
-        '6':('7:1','7:1','3:1'),
-        '7':('6:1','6:1','2.5:1'),
-        '8':('5:1','5:1','2.5:1'),
-        '9':('4:1','4:1','2:1'),
-        '10':('3.5:1','3.5:1','1.5:1'),
-        '11':('3.3:1','3.2:1','1.5:1'),
-        '12':('3:1','3:1','1.2:1'),
-        }
 
 
-def dedupe(board):
-    duplicate = False
-    c = Counter(board)
-    for card in board:
-        if c[card] > 1:
-            duplicate = True
-            return duplicate
-    return duplicate
 
 
-def validate_card(check):
-    """Detect invalid cards in a passed collection"""
-    valid = True
-    deck = generate_deck()
-    valid_cards = [card.name for card in deck]
-    for card in check:
-        if card not in valid_cards:
-            valid = False
-            return valid
-    return valid
 
 
 def make_card(input_list):
