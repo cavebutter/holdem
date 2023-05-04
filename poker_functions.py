@@ -43,6 +43,18 @@ def validate_card(check):
     return valid
 
 
+def make_card(input_list):
+    """Input_list is either a list of Card objects or string Objects.  If Cards, return the cards.
+      If string, convert to Card and return"""
+    if isinstance(input_list[0], Card):
+        return input_list
+    else:
+        card_list = [Card(card) for card in input_list]
+        return card_list
+
+
+
+
 #####     POKER     #####
 @dataclass
 class Card:
@@ -113,8 +125,10 @@ class Deck(list):
 
 def find_flush(hand, board):
     """Does any combination of 5 cards in hand or on board amount to 5 of the same suit"""
+    hand = make_card(hand)
+    board = make_card(board)
     total_hand = hand + board
-    total_hand_suits = [Card(card).suit for card in total_hand]
+    total_hand_suits = [card.suit for card in total_hand]
     flush = False
     c = Counter(total_hand_suits)
     for suit in total_hand_suits:
@@ -126,9 +140,11 @@ def find_flush(hand, board):
 
 def find_multiple(hand, board, n=2):
     """Is there a pair, three of a kind, four of a kind/?"""
+    hand = make_card(hand)
+    board = make_card(board)
     multiple = False
     total_hand = hand + board
-    total_hand = [Card(card) for card in total_hand]
+    total_hand = [card for card in total_hand]
     values = [card.value for card in total_hand]
     c = Counter(values)
     for value in values:
@@ -140,9 +156,11 @@ def find_multiple(hand, board, n=2):
 
 def find_two_pair(hand, board):
     """Is there two-pair?"""
+    hand = make_card(hand)
+    board = make_card(board)
     two_pair = False
     total_hand = hand + board
-    values = [Card(card).value for card in total_hand]
+    values = [card.value for card in total_hand]
     c = Counter(values)
     for value in values:
         if c[value] > 1:
@@ -156,9 +174,11 @@ def find_two_pair(hand, board):
 
 def find_full_house(hand, board):
     """Is there a full house?"""
+    hand = make_card(hand)
+    board = make_card(board)
     boat = False
     total_hand = hand + board
-    values = [Card(card).value for card in total_hand]
+    values = [card.value for card in total_hand]
     c = Counter(values)
     for value in values:
         if c[value] == 3: # This looks overly indented but should offer early exit if there is no 3OK
@@ -187,10 +207,12 @@ def evaluate_straight(values):
 
 def find_straight(hand, board):
     """Find a straight in a given hand/board combination"""
+    hand = make_card(hand)
+    board = make_card(board)
     straight = False
     reqd_hand_size = 5  # required hand size gives us some flexibility at the cost of more lines.  could be more efficient if we say 'if len(values)<5'
     total_hand = hand + board
-    values = [*set(Card(card).value for card in total_hand)]
+    values = [*set(card.value for card in total_hand)]
     if 14 in values:
         values.append(1)  # Allows for low straight
     values.sort()
@@ -204,10 +226,12 @@ def find_straight(hand, board):
 
 def find_straight_flush(hand, board):
     """Find a straight flush in a given hand/board combination"""
+    hand = make_card(hand)
+    board = make_card(board)
     flush = find_flush(hand, board)
     if flush:
         total_hand = hand + board
-        total_hand = [Card(card) for card in total_hand]
+        total_hand = [card for card in total_hand]
         hand_suits = [card.suit for card in total_hand]
         c = Counter(hand_suits)
         flush_suit = c.most_common(1)[0][0]

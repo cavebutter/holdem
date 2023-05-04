@@ -26,29 +26,29 @@ def simulation(hand, flop=[], turn=[], river=[], sims=100000):
         for k in range(j): # Add additional cards to make a full board of 7
             deal, deck = deck.deal_card()
             board.append(deal)
-        straight_flush = p.find_straight_flush(hand, board)
+        straight_flush = p.find_straight_flush(hole_cards, board)
         if straight_flush:
             straight_flushes += 1
             continue
-        elif p.find_multiple(hand, board, 4):
+        elif p.find_multiple(hole_cards, board, 4):
             quads += 1
             continue
-        elif p.find_full_house(hand, board):
+        elif p.find_full_house(hole_cards, board):
             boats += 1
             continue
-        elif p.find_flush(hand, board):
+        elif p.find_flush(hole_cards, board):
             flushes += 1
             continue
-        elif p.find_straight(hand, board):
+        elif p.find_straight(hole_cards, board):
             straights += 1
             continue
-        elif p.find_multiple(hand, board, 3):
+        elif p.find_multiple(hole_cards, board, 3):
             trips += 1
             continue
-        elif p.find_two_pair(hand, board):
+        elif p.find_two_pair(hole_cards, board):
             two_pairs += 1
             continue
-        elif p.find_multiple(hand, board):
+        elif p.find_multiple(hole_cards, board):
             pairs += 1
             continue
         i += 1
