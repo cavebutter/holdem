@@ -166,7 +166,7 @@ def test_update_deck_4():
     deck = p.generate_deck()
     deck.update_deck(passed_card)
     cards = [card.name for card in deck]
-    assert passed_card.name not in cards
+    assert passed_card not in cards
 
 def test_valid_card():
     check = hand9 + flop9 + turn9 + river9

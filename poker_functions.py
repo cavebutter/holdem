@@ -93,7 +93,7 @@ class Deck(list):
         return len(self.deck)
 
     def deal_card(self):
-        """Select a random card from the deck"""
+        """Select a random card from the deck.  Return the card and the deck with the card removed"""
         i = random.randint(0, len(self)-1)
         card = self[i]
         self.deck.pop(i)
@@ -101,14 +101,14 @@ class Deck(list):
 
     def update_deck(self, card):
         """Remove card from deck"""
+        deck_names = [card.name for card in self.deck]
         if isinstance(card, Card):
             card_name = card.name
         else:
             card_name = card
-        for item in self:
-            if card_name == item.name:
-                self.deck.remove(item)
-        return self
+        deck_idx = deck_names.index(card_name)
+        self.deck.pop(deck_idx)
+
 
 
 def find_flush(hand, board):
