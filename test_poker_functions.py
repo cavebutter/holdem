@@ -249,19 +249,19 @@ def test_straight_wheel():
 
 def test_not_straight_flush():
     board = flop1 + turn1 + river1
-    straight_flush = p.find_straight_flush(hand1, board)
-    assert not straight_flush
+    straight_flush, straight_flush_hand = p.find_straight_flush(hand1, board)
+    assert not straight_flush and straight_flush_hand is None
 
 def test_not_straight_flush_flush():
     board = flop2 + turn2 + river2
-    straight_flush = p.find_straight_flush(hand2, board)
-    assert not straight_flush
+    straight_flush, straight_flush_hand = p.find_straight_flush(hand2, board)
+    assert not straight_flush and straight_flush_hand is None
 
 
 def test_straight_flush():
     board = flop6 + turn6 + river6
-    straight_flush = p.find_straight_flush(hand6, board)
-    assert straight_flush
+    straight_flush, straight_flush_hand = p.find_straight_flush(hand6, board)
+    assert straight_flush and straight_flush_hand.high_value == 8
 
 def test_hand_init():
     my_hand = new_hand

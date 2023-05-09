@@ -287,7 +287,7 @@ def find_straight(hand, board):
         straight, straight_hand_values = evaluate_straight(values)
         if straight:
             hand_type = 'straight'
-            if 14 in straight_hand_values:
+            if 14 in straight_hand_values: # all([5,14]) does not work here so using nested ifs.
                 if 5 in straight_hand_values:
                     high_card = 5
             else:
@@ -302,7 +302,9 @@ def find_straight_flush(hand, board):
     """Find a straight flush in a given hand/board combination"""
     hand = make_card(hand)
     board = make_card(board)
-    flush = find_flush(hand, board)
+    straight_flush = False
+    straight_flush_hand = None
+    flush, _ = find_flush(hand, board)
     if flush:
         total_hand = hand + board
         total_hand = [card for card in total_hand]
@@ -310,6 +312,13 @@ def find_straight_flush(hand, board):
         c = Counter(hand_suits)
         flush_suit = c.most_common(1)[0][0]
         flush_hand = [card.value for card in total_hand if card.suit == flush_suit]
-        straight_flush = evaluate_straight(flush_hand)
-        return straight_flush
-
+        straight_flush, straight_hand = evaluate_straight(flush_hand)
+        if straight_flush:
+            high_value = max(straight_hand)
+            hand_type = 'straight_flush'
+            straight_flush_hand = Hand(hand_type,high_value)
+            return straight_flush, straight_flush_hand
+        else:
+            return straight_flush, straight_flush_hand
+    else:
+        return straight_flush, straight_flush_hand
