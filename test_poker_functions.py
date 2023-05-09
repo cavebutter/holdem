@@ -217,34 +217,34 @@ def test_3ok():
 
 def test_straight_sequential():
     board3 = flop3 + turn3 + river3
-    straight = p.find_straight(hand3, board3)
-    assert straight
+    straight, straight_hand = p.find_straight(hand3, board3)
+    assert straight and straight_hand.type == 'straight'
 
 def test_straight_non_sequential():
     board7 = flop7 + turn7 + river7
-    straight = p.find_straight(hand7, board7)
-    assert straight
+    straight, straight_hand = p.find_straight(hand7, board7)
+    assert straight and straight_hand.high_rank == '6'
 
 def test_straight_5_card():
     board8 = flop8 + turn8 + river8
-    straight = p.find_straight(hand8, board8)
-    assert straight
+    straight, straight_hand = p.find_straight(hand8, board8)
+    assert straight and straight_hand.kicker is None
 
 def test_straight_6_card():
     board9 = flop9 + turn9 + river9
-    straight = p.find_straight(hand9, board9)
-    assert straight
+    straight, straight_hand = p.find_straight(hand9, board9)
+    assert straight and straight_hand.high_value == 7
 
 def test_not_straight():
     board4 = flop4 + turn4 + river4
-    straight = p.find_straight(hand4, board4)
-    assert not straight
+    straight, straight_hand = p.find_straight(hand4, board4)
+    assert not straight and straight_hand is None
 
 
 def test_straight_wheel():
     board12 = flop12 + turn12 + river12
-    straight = p.find_straight(hand12, board12)
-    assert straight
+    straight, straight_hand = p.find_straight(hand12, board12)
+    assert straight and straight_hand.high_rank == '5'
 
 
 def test_not_straight_flush():

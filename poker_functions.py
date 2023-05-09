@@ -254,15 +254,18 @@ def evaluate_straight(values):
     """Evaluates a list of card values to determine whether there are 5 consecutive values"""
     straight = False
     count = 0
+    straight_hand_values = []
     for rank in (14, *range(2, 15)):
         if rank in values:
             count += 1
+            straight_hand_values.append(rank)
             if count == 5:
                 straight = True
-                return straight
+                return straight, straight_hand_values
         else:
             count = 0
-    return straight
+            straight_hand_values = []
+    return straight, straight_hand_values
 
 
 def find_straight(hand, board):
@@ -274,15 +277,22 @@ def find_straight(hand, board):
     reqd_hand_size = 5  # required hand size gives us some flexibility at the cost of more lines.  could be more efficient if we say 'if len(values)<5'
     total_hand = hand + board
     values = [*set(card.value for card in total_hand)]
-    if 14 in values:
-        values.append(1)  # Allows for low straight
-    values.sort()
+    total_hand_values = [card.value for card in total_hand]
     slices = len(values) - reqd_hand_size
     if slices < 0:
         return straight, straight_hand
     else:
-        straight = evaluate_straight(values)
-        return straight
+        straight, straight_hand_values = evaluate_straight(values)
+        if straight:
+            hand_type = 'straight'
+            if 14 and 5 in straight_hand_values:
+                high_card = 5
+            else:
+                high_card = max(straight_hand_values)
+            straight_hand = Hand(hand_type, high_card)
+            return straight, straight_hand
+        else:
+            return straight, straight_hand
 
 
 def find_straight_flush(hand, board):
