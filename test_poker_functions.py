@@ -1,3 +1,4 @@
+import poker_functions
 import poker_functions as p
 
 # valid card string
@@ -5,6 +6,9 @@ card_str1 = 'As'
 
 # invalid card string
 card_string2 = 'Of'
+
+#  hand with kicker
+new_hand = p.Hand('pair', 12, 11)
 
 # 2 Pair
 hand1 = ['As', '4c']
@@ -169,50 +173,46 @@ def test_update_deck_4():
     assert passed_card not in cards
 
 
-
-
-
-
 def test_no_flush():
     board = flop1 + turn1 + river1
-    flush = p.find_flush(hand1, board)
-    assert not flush
+    flush, flush_hand = p.find_flush(hand1, board)
+    assert not flush and flush_hand == None
 
 def test_flush():
     board2 = flop2 + turn2 + river2
-    flush = p.find_flush(hand2, board2)
-    assert flush
+    flush, flush_hand = p.find_flush(hand2, board2)
+    assert flush and flush_hand.high_value == 14
 
 
 def test_one_pair():
     board2 = flop2 + turn2 + river2
-    pair = p.find_multiple(hand2, board2)
-    assert pair
+    pair, multiple_hand = p.find_multiple(hand2, board2)
+    assert pair and multiple_hand.type == 'pair'
 
 def test_not_one_pair():
     board3 = flop3 + turn3 + river3
-    pair = p.find_multiple(hand3, board3)
-    assert not pair
+    pair, multiple_hand = p.find_multiple(hand3, board3)
+    assert not pair and multiple_hand is None
 
 def test_not_two_pair():
     board3 = flop3 + turn3 + river3
-    two_pair = p.find_two_pair(hand3, board3)
-    assert not two_pair
+    two_pair, two_pair_hand = p.find_two_pair(hand3, board3)
+    assert not two_pair and two_pair_hand is None
 
 def test_two_pair():
     board1 = flop1 + turn1 + river1
-    two_pair = p.find_two_pair(hand1, board1)
-    assert two_pair
+    two_pair, two_pair_hand = p.find_two_pair(hand1, board1)
+    assert two_pair and two_pair_hand.type == '2pair' and two_pair_hand.kicker_rank == 'Q'
 
 def test_not_3ok():
     board1 = flop1 + turn1 + river1
-    three_o_kind = p.find_multiple(hand1, board1, 3)
-    assert not three_o_kind
+    three_o_kind, three_o_kind_hand = p.find_multiple(hand1, board1, 3)
+    assert not three_o_kind and three_o_kind_hand is None
 
 def test_3ok():
     board4 = flop4 + turn4 + river4
-    three_o_kind = p.find_multiple(hand4, board4, 3)
-    assert three_o_kind
+    three_o_kind, three_o_kind_hand = p.find_multiple(hand4, board4, 3)
+    assert three_o_kind and three_o_kind_hand.type == '3ok'
 
 
 def test_straight_sequential():
@@ -262,3 +262,17 @@ def test_straight_flush():
     board = flop6 + turn6 + river6
     straight_flush = p.find_straight_flush(hand6, board)
     assert straight_flush
+
+def test_hand_init():
+    my_hand = new_hand
+    assert type(my_hand) == poker_functions.Hand
+
+def test_hand_value():
+    my_hand = new_hand
+    assert new_hand.hand_value == 2
+
+
+def test_full_house():
+    board = turn5 + flop5 + river5
+    full_house, full_house_hand = p.find_full_house(hand5, board)
+    assert full_house and full_house_hand.kicker_rank == 'Q'

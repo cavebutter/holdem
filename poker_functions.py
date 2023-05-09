@@ -5,8 +5,18 @@ from dataclasses import dataclass
 card_values = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
 ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A']
 rank_value = dict(zip(ranks, card_values))
+value_rank = dict(zip(card_values, ranks))
 suits = ['c', 'd', 'h', 's']
-
+hand_values = {'hc': 1,
+               'pair': 2,
+               '2pair': 3,
+               '3ok': 4,
+               'straight': 5,
+               'flush': 6,
+               'boat': 7,
+               '4ok': 8,
+               'straight_flush': 9
+               }
 
 
 
@@ -46,6 +56,55 @@ class Card:
             return self.name
         elif item == 'value':
             return self.value
+
+
+@dataclass()
+class Hand:
+    def __init__(self, type, high_value, low_value = 0, kicker=None):
+        """Type = name of hand (e.g. Pair)
+        value = value of the hand (i.e. Straight Flush is the most valuable)
+        high_value = value.  either the high card in straight or flush, the set in full house, the top pair in 2pair, etc
+        low_value = the lower pair in 2 pair or the pair in a full house
+        kicker = value of the kicker in the hand.  Can be null
+        """
+        if kicker in card_values:
+            kicker_rank = value_rank[kicker]
+        else:
+            kicker_rank = 0
+        if low_value in card_values:
+            low_rank = value_rank[low_value]
+        else:
+            low_rank = 0
+        self.type = type
+        self.hand_value = hand_values[type]
+        self.kicker = kicker
+        self.kicker_rank = kicker_rank
+        self.high_value = high_value
+        self.high_rank = value_rank[self.high_value]
+        self.low_value = low_value
+        self.low_rank = low_rank
+
+    def __str__(self):
+        return self.type + '-' + self.high_rank
+
+    def __getitem__(self, item):
+        if item == 'type':
+            return self.type
+        elif item == 'hand_value':
+            return self.high_value
+        elif item == 'kicker':
+            return self.kicker
+        elif item == 'kicker_rank':
+            return self.kicker_rank
+        elif item == 'high_value':
+            return self.high_value
+        elif item == 'high_rank':
+            return self.high_rank
+        elif item == 'low_value':
+            return self.low_value
+        elif item == 'low_rank':
+            return self.low_rank
+
 
 
 def generate_deck():
@@ -99,12 +158,16 @@ def find_flush(hand, board):
     total_hand = hand + board
     total_hand_suits = [card.suit for card in total_hand]
     flush = False
+    flush_hand = None
     c = Counter(total_hand_suits)
     for suit in total_hand_suits:
         if c[suit] >= 5:
             flush = True
-            return flush
-    return flush
+    if flush:
+        flush_cards = [card for card in total_hand if card.suit == c.most_common(1)[0][0]]
+        high_value = max([card.value for card in flush_cards])
+        flush_hand = Hand('flush', high_value)
+    return flush, flush_hand
 
 
 def find_multiple(hand, board, n=2):
@@ -112,15 +175,33 @@ def find_multiple(hand, board, n=2):
     hand = make_card(hand)
     board = make_card(board)
     multiple = False
+    multiple_hand = None
     total_hand = hand + board
-    total_hand = [card for card in total_hand]
     values = [card.value for card in total_hand]
     c = Counter(values)
-    for value in values:
-        if c[value] == n:
+    for value in set(values):
+        if c[value] == 2 and n == 2:
             multiple = True
-            return multiple
-    return multiple
+            hand_type = 'pair'
+            high_value = value
+            kicker = max([value for value in values if value != high_value])
+            multiple_hand = Hand(hand_type, high_value, kicker)
+            return multiple, multiple_hand
+        elif c[value] == 3 and n == 3:
+            multiple = True
+            hand_type = '3ok'
+            high_value = c[value]
+            kicker = max([value for value in values if value != high_value])
+            multiple_hand = Hand(hand_type, high_value, kicker)
+            return multiple, multiple_hand
+        elif c[value] == 4 and n == 4:
+            multiple = True
+            hand_type = '4ok'
+            high_value = c[value]
+            kicker = max([value for value in values if value != high_value])
+            multiple_hand = Hand(hand_type, high_value, kicker)
+            return multiple, multiple_hand
+    return multiple, multiple_hand
 
 
 def find_two_pair(hand, board):
@@ -128,17 +209,22 @@ def find_two_pair(hand, board):
     hand = make_card(hand)
     board = make_card(board)
     two_pair = False
+    two_pair_hand = None
     total_hand = hand + board
     values = [card.value for card in total_hand]
     c = Counter(values)
     for value in values:
         if c[value] > 1:
+            pair1 = Hand('pair', value)
             c.pop(value)
             for value in values:
                 if c[value] > 1:
+                    pair2 = Hand('pair', value)
+                    kicker = max([value for value in values if value != pair1.high_value and value != pair2.high_value])
+                    two_pair_hand = Hand('2pair', max(pair1.high_value, pair2.high_value), low_value=min(pair1.high_value, pair2.high_value), kicker=kicker)
                     two_pair = True
-                    return two_pair
-    return two_pair
+                    return two_pair, two_pair_hand
+    return two_pair, two_pair_hand
 
 
 def find_full_house(hand, board):
@@ -146,17 +232,22 @@ def find_full_house(hand, board):
     hand = make_card(hand)
     board = make_card(board)
     boat = False
+    boat_hand = None
     total_hand = hand + board
     values = [card.value for card in total_hand]
     c = Counter(values)
-    for value in values:
+    for value in set(values):
         if c[value] == 3: # This looks overly indented but should offer early exit if there is no 3OK
+            high_value = value
             c.pop(value)
-            for value in values:
+            for value in set(values):
                 if c[value] > 1:
+                    low_value = value
+                    kicker = max([value for value in values if value != high_value and value != low_value])
+                    boat_hand = Hand('boat', high_value, low_value=low_value, kicker=kicker)
                     boat = True
-                    return boat
-    return boat
+                    return boat, boat_hand
+    return boat, boat_hand
 
 
 def evaluate_straight(values):
@@ -179,6 +270,7 @@ def find_straight(hand, board):
     hand = make_card(hand)
     board = make_card(board)
     straight = False
+    straight_hand = None
     reqd_hand_size = 5  # required hand size gives us some flexibility at the cost of more lines.  could be more efficient if we say 'if len(values)<5'
     total_hand = hand + board
     values = [*set(card.value for card in total_hand)]
@@ -187,7 +279,7 @@ def find_straight(hand, board):
     values.sort()
     slices = len(values) - reqd_hand_size
     if slices < 0:
-        return straight
+        return straight, straight_hand
     else:
         straight = evaluate_straight(values)
         return straight
