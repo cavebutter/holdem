@@ -84,6 +84,13 @@ flop12 = ['2c', '3h', 'Qs']
 turn12 = ['4s']
 river12 = ['5d']
 
+
+#  High Card
+hand13 = ['Td', '4c']
+flop13 = ['2c', '3h', 'Qs']
+turn13 = ['5d']
+river13 = ['9c']
+
 def test_card_init():
     card = p.Card(card_str1)
     assert type(card) == p.Card
@@ -175,93 +182,93 @@ def test_update_deck_4():
 
 def test_no_flush():
     board = flop1 + turn1 + river1
-    flush, flush_hand = p.find_flush(hand1, board)
-    assert not flush and flush_hand == None
+    flush = p.find_flush(hand1, board)
+    assert not flush
 
 def test_flush():
     board2 = flop2 + turn2 + river2
-    flush, flush_hand = p.find_flush(hand2, board2)
-    assert flush and flush_hand.high_value == 14
+    flush_hand = p.find_flush(hand2, board2)
+    assert flush_hand.high_value == 14 and flush_hand.type == 'flush'
 
 
 def test_one_pair():
     board2 = flop2 + turn2 + river2
-    pair, multiple_hand = p.find_multiple(hand2, board2)
-    assert pair and multiple_hand.type == 'pair'
+    multiple_hand = p.find_multiple(hand2, board2)
+    assert multiple_hand.type == 'pair'
 
 def test_not_one_pair():
     board3 = flop3 + turn3 + river3
-    pair, multiple_hand = p.find_multiple(hand3, board3)
-    assert not pair and multiple_hand is None
+    pair = p.find_multiple(hand3, board3)
+    assert not pair
 
 def test_not_two_pair():
     board3 = flop3 + turn3 + river3
-    two_pair, two_pair_hand = p.find_two_pair(hand3, board3)
-    assert not two_pair and two_pair_hand is None
+    two_pair = p.find_two_pair(hand3, board3)
+    assert not two_pair
 
 def test_two_pair():
     board1 = flop1 + turn1 + river1
-    two_pair, two_pair_hand = p.find_two_pair(hand1, board1)
-    assert two_pair and two_pair_hand.type == '2pair' and two_pair_hand.kicker_rank == 'Q'
+    two_pair_hand = p.find_two_pair(hand1, board1)
+    assert two_pair_hand.type == '2pair' and two_pair_hand.kicker_rank == 'Q'
 
 def test_not_3ok():
     board1 = flop1 + turn1 + river1
-    three_o_kind, three_o_kind_hand = p.find_multiple(hand1, board1, 3)
-    assert not three_o_kind and three_o_kind_hand is None
+    three_o_kind = p.find_multiple(hand1, board1, 3)
+    assert not three_o_kind
 
 def test_3ok():
     board4 = flop4 + turn4 + river4
-    three_o_kind, three_o_kind_hand = p.find_multiple(hand4, board4, 3)
-    assert three_o_kind and three_o_kind_hand.type == '3ok'
+    three_o_kind_hand = p.find_multiple(hand4, board4, 3)
+    assert three_o_kind_hand.type == '3ok'
 
 
 def test_straight_sequential():
     board3 = flop3 + turn3 + river3
-    straight, straight_hand = p.find_straight(hand3, board3)
-    assert straight and straight_hand.type == 'straight'
+    straight_hand = p.find_straight(hand3, board3)
+    assert straight_hand.type == 'straight'
 
 def test_straight_non_sequential():
     board7 = flop7 + turn7 + river7
-    straight, straight_hand = p.find_straight(hand7, board7)
-    assert straight and straight_hand.high_rank == '6'
+    straight_hand = p.find_straight(hand7, board7)
+    assert straight_hand.high_rank == '6'
 
 def test_straight_5_card():
     board8 = flop8 + turn8 + river8
-    straight, straight_hand = p.find_straight(hand8, board8)
-    assert straight and straight_hand.kicker is None
+    straight_hand = p.find_straight(hand8, board8)
+    assert straight_hand.kicker is None
 
 def test_straight_6_card():
     board9 = flop9 + turn9 + river9
-    straight, straight_hand = p.find_straight(hand9, board9)
-    assert straight and straight_hand.high_value == 7
+    straight_hand = p.find_straight(hand9, board9)
+    assert straight_hand.high_value == 7
 
 def test_not_straight():
     board4 = flop4 + turn4 + river4
-    straight, straight_hand = p.find_straight(hand4, board4)
-    assert not straight and straight_hand is None
+    straight = p.find_straight(hand4, board4)
+    assert not straight
 
 
 def test_straight_wheel():
     board12 = flop12 + turn12 + river12
-    straight, straight_hand = p.find_straight(hand12, board12)
-    assert straight and straight_hand.high_rank == '5'
+    straight_hand = p.find_straight(hand12, board12)
+    assert straight_hand.high_rank == '5'
 
 
 def test_not_straight_flush():
     board = flop1 + turn1 + river1
-    straight_flush, straight_flush_hand = p.find_straight_flush(hand1, board)
-    assert not straight_flush and straight_flush_hand is None
+    straight_flush = p.find_straight_flush(hand1, board)
+    assert not straight_flush
 
 def test_not_straight_flush_flush():
     board = flop2 + turn2 + river2
-    straight_flush, straight_flush_hand = p.find_straight_flush(hand2, board)
-    assert not straight_flush and straight_flush_hand is None
+    straight_flush = p.find_straight_flush(hand2, board)
+    assert not straight_flush
 
 
 def test_straight_flush():
     board = flop6 + turn6 + river6
-    straight_flush, straight_flush_hand = p.find_straight_flush(hand6, board)
-    assert straight_flush and straight_flush_hand.high_value == 8
+    straight_flush_hand = p.find_straight_flush(hand6, board)
+    assert straight_flush_hand.high_value == 8
 
 def test_hand_init():
     my_hand = new_hand
@@ -274,5 +281,11 @@ def test_hand_value():
 
 def test_full_house():
     board = turn5 + flop5 + river5
-    full_house, full_house_hand = p.find_full_house(hand5, board)
-    assert full_house and full_house_hand.kicker_rank == 'Q'
+    full_house_hand = p.find_full_house(hand5, board)
+    assert full_house_hand.kicker_rank == 'Q'
+
+
+def test_high_card():
+    board = flop13 + turn13 + river13
+    high_card_hand = p.find_high_card(hand13, board)
+    assert high_card_hand.type == 'hc' and high_card_hand.low_value == 10

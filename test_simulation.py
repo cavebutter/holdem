@@ -19,12 +19,13 @@ hand11 = ['3c', 'As']
 flop11 = ['9c', 'Jd', '9h']
 turn11 = ['4s']
 river11 = ['Ss']
+
 def test_simulation_incomplete_board():
     """Will the sim run without errors with an incomplete board? Minimum result is 1 pair"""
     hand = ['Ac', '3d']
     flop = ['As', '5c', '4d']
     sims = 5
-    sim = s.simulation(hand, flop, sims=sims)
+    sim = s.simulation_one_player(hand, flop, sims=sims)
     assert sim[0] == 5
 
 
@@ -32,8 +33,8 @@ def test_no_impossible_straight():
     """Prior to refactor, this hand and others similar would yield a small % of straights"""
     hand = ['As', 'Kd']
     flop = ['Kh', '6c', '4s']
-    sim = s.simulation(hand, flop)
-    assert sim[4] == 0
+    sim = s.simulation_one_player(hand, flop)
+    assert sim[5] == 0
 
 
 def test_duplicate_card():

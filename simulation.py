@@ -26,10 +26,35 @@ def validate_card(check):
             return valid
     return valid
 
-def simulation(hand, flop=[], turn=[], river=[], sims=100000):
-    passed_board = flop + turn + river
-    full_board = 7 # number of cards required to run a sim
-    passed_cards = len(hand) + len(passed_board)
+
+def convert_and_update(deck, cards):
+    if len(cards) == 0:
+        return deck, cards
+    else:
+        cards = p.make_card(cards)
+        for card in cards:
+            deck.update_deck(card)
+        return deck, cards
+
+#####     SIMULATIONS     #####
+def evaluate_hand(hole_cards, flop=[], turn=[], river=[]):
+    board = flop + turn + river
+    hand = None
+    if len(hole_cards + board) < 5:
+        return hand
+    else:
+        for func in p.HAND_REGISTRY:
+            func = func(hole_cards, board)
+            if not func:
+                continue
+            else:
+                return func
+
+def simulation_one_player(hole, flop=[], turn=[], river=[], sims=100000):
+    full_board = 7 # number of cards required to run sim
+    passed_cards = len(hole) + len(flop) + len(turn) + len(river)
+    passed_flop = [item for item in flop]
+    high_cards = 0
     pairs = 0
     two_pairs = 0
     trips = 0
@@ -38,45 +63,115 @@ def simulation(hand, flop=[], turn=[], river=[], sims=100000):
     boats = 0
     quads = 0
     straight_flushes = 0
+    invalid = 0
     for i in range(sims):
         deck = p.generate_deck()
-        hole_cards = [p.Card(card) for card in hand]
-        for card in hole_cards:
-            deck.update_deck(card)
-        board = [p.Card(card) for card in passed_board]
-        for board_card in passed_board: #  Add board cards to total hand
-            deck.update_deck(board_card)
-        j = full_board - passed_cards # number of cards required to deal for full board
-        for k in range(j): # Add additional cards to make a full board of 7
+        deck, hole = convert_and_update(deck, hole)
+        deck, flop = convert_and_update(deck, flop)
+        deck, turn = convert_and_update(deck, turn)
+        deck, river = convert_and_update(deck, river)
+        j = full_board - passed_cards
+        for k in range(j):  # Add additional cards to make a full board of 7
             deal, deck = deck.deal_card()
-            board.append(deal)
-        straight_flush = p.find_straight_flush(hole_cards, board)
-        if straight_flush:
+            flop.append(deal)  # Adding to flop because it shouldn't matter
+        hand = evaluate_hand(hole, flop, turn, river)
+        if hand.type == 'straight_flush':
             straight_flushes += 1
-            continue
-        elif p.find_multiple(hole_cards, board, 4):
+        elif hand.type == '4ok':
             quads += 1
-            continue
-        elif p.find_full_house(hole_cards, board):
+        elif hand.type == 'boat':
             boats += 1
-            continue
-        elif p.find_flush(hole_cards, board):
+        elif hand.type == 'flush':
             flushes += 1
-            continue
-        elif p.find_straight(hole_cards, board):
+        elif hand.type == 'straight':
             straights += 1
-            continue
-        elif p.find_multiple(hole_cards, board, 3):
+        elif hand.type == '3ok':
             trips += 1
-            continue
-        elif p.find_two_pair(hole_cards, board):
+        elif hand.type == '2pair':
             two_pairs += 1
-            continue
-        elif p.find_multiple(hole_cards, board):
+        elif hand.type == 'pair':
             pairs += 1
-            continue
+        elif hand.type == 'hc':
+            high_cards += 1
+        else:
+            invalid += 1
         i += 1
-    return sims, pairs, two_pairs, trips, straights, flushes, boats, quads, straight_flushes
+        flop = [item for item in passed_flop] # Reset flop back to original
+    return sims, high_cards, pairs, two_pairs, trips, straights, flushes, boats, quads, straight_flushes
+
+# def simulation_one_player(hand, flop=[], turn=[], river=[], sims=100000):
+#     passed_board = flop + turn + river
+#     full_board = 7 # number of cards required to run a sim
+#     passed_cards = len(hand) + len(passed_board)
+#     high_cards = 0
+#     pairs = 0
+#     two_pairs = 0
+#     trips = 0
+#     straights = 0
+#     flushes = 0
+#     boats = 0
+#     quads = 0
+#     straight_flushes = 0
+#     for i in range(sims):
+#         deck = p.generate_deck()
+#         hole_cards = [p.Card(card) for card in hand]
+#         for card in hole_cards:
+#             deck.update_deck(card)
+#         board = [p.Card(card) for card in passed_board]
+#         for board_card in passed_board: #  Add board cards to total hand
+#             deck.update_deck(board_card)
+#         j = full_board - passed_cards # number of cards required to deal for full board
+#         for k in range(j): # Add additional cards to make a full board of 7
+#             deal, deck = deck.deal_card()
+#             board.append(deal)
+#         straight_flush, straight_flush_hand = p.find_straight_flush(hand, board)
+#         if straight_flush is True:
+#             straight_flushes += 1
+#             continue
+#         else:
+#             quad, quad_hand = p.find_multiple(hand, board, n=4)
+#             if quad is True:
+#                 quads += 1
+#                 continue
+#             else:
+#                 boat, boat_hand = p.find_full_house(hand, board)
+#                 if boat is True:
+#                     boats += 1
+#                     continue
+#                 else:
+#                     flush, flush_hand = p.find_flush(hand, board)
+#                     if flush is True:
+#                         flushes += 1
+#                         continue
+#                     else:
+#                         straight, straight_hand = p.find_straight(hand, board)
+#                         if straight is True:
+#                             straights += 1
+#                             continue
+#                         else:
+#                             trip, trip_hand = p.find_multiple(hand, board, n=3)
+#                             if trip is True:
+#                                 trips += 1
+#                                 continue
+#                             else:
+#                                 two_pair, two_pair_hand = p.find_two_pair(hand, board)
+#                                 if two_pair is True:
+#                                     two_pairs += 1
+#                                     continue
+#                                 else:
+#                                     pair, pair_hand = p.find_multiple(hand, board)
+#                                     if pair is True:
+#                                         pairs += 1
+#                                         continue
+#                                     else:
+#                                         hc, high_card_hand = p.find_high_card(hand, board)
+#                                         high_cards += 1
+#         i += 1
+#     return sims, high_cards, pairs, two_pairs, trips, straights, flushes, boats, quads, straight_flushes
+
+
+
+
 
 
 #####     MATH     #####
