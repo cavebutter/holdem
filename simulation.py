@@ -3,7 +3,20 @@ from fractions import Fraction
 from collections import Counter
 
 
+class Player:
+    def __init__(self, number, cards=[]):
+        if len(cards) > 0:
+            cards = p.make_card(cards)
+        else:
+            cards = []
+        self.number = number
+        self.cards = cards
+        self.hand = None
+        self.starting_cards = None
+        self.wins = 0
 
+    def __str__(self):
+        return "player_" + str(self.number)
 
 def dedupe(board):
     duplicate = False
@@ -99,79 +112,56 @@ def simulation_one_player(hole, flop=[], turn=[], river=[], sims=100000):
         flop = [item for item in passed_flop] # Reset flop back to original
     return sims, high_cards, pairs, two_pairs, trips, straights, flushes, boats, quads, straight_flushes
 
-# def simulation_one_player(hand, flop=[], turn=[], river=[], sims=100000):
-#     passed_board = flop + turn + river
-#     full_board = 7 # number of cards required to run a sim
-#     passed_cards = len(hand) + len(passed_board)
-#     high_cards = 0
-#     pairs = 0
-#     two_pairs = 0
-#     trips = 0
-#     straights = 0
-#     flushes = 0
-#     boats = 0
-#     quads = 0
-#     straight_flushes = 0
-#     for i in range(sims):
-#         deck = p.generate_deck()
-#         hole_cards = [p.Card(card) for card in hand]
-#         for card in hole_cards:
-#             deck.update_deck(card)
-#         board = [p.Card(card) for card in passed_board]
-#         for board_card in passed_board: #  Add board cards to total hand
-#             deck.update_deck(board_card)
-#         j = full_board - passed_cards # number of cards required to deal for full board
-#         for k in range(j): # Add additional cards to make a full board of 7
-#             deal, deck = deck.deal_card()
-#             board.append(deal)
-#         straight_flush, straight_flush_hand = p.find_straight_flush(hand, board)
-#         if straight_flush is True:
-#             straight_flushes += 1
-#             continue
-#         else:
-#             quad, quad_hand = p.find_multiple(hand, board, n=4)
-#             if quad is True:
-#                 quads += 1
-#                 continue
-#             else:
-#                 boat, boat_hand = p.find_full_house(hand, board)
-#                 if boat is True:
-#                     boats += 1
-#                     continue
-#                 else:
-#                     flush, flush_hand = p.find_flush(hand, board)
-#                     if flush is True:
-#                         flushes += 1
-#                         continue
-#                     else:
-#                         straight, straight_hand = p.find_straight(hand, board)
-#                         if straight is True:
-#                             straights += 1
-#                             continue
-#                         else:
-#                             trip, trip_hand = p.find_multiple(hand, board, n=3)
-#                             if trip is True:
-#                                 trips += 1
-#                                 continue
-#                             else:
-#                                 two_pair, two_pair_hand = p.find_two_pair(hand, board)
-#                                 if two_pair is True:
-#                                     two_pairs += 1
-#                                     continue
-#                                 else:
-#                                     pair, pair_hand = p.find_multiple(hand, board)
-#                                     if pair is True:
-#                                         pairs += 1
-#                                         continue
-#                                     else:
-#                                         hc, high_card_hand = p.find_high_card(hand, board)
-#                                         high_cards += 1
-#         i += 1
-#     return sims, high_cards, pairs, two_pairs, trips, straights, flushes, boats, quads, straight_flushes
 
-
-
-
+def multiplayer(hole_one, hole_two=[], hole_three=[], hole_four=[], hole_five=[], hole_six=[],
+                flop = [], turn = [], river = [], opponents=2, sims=10000):
+    contestant_hands = [hole_one, hole_two, hole_three, hole_four, hole_five, hole_six]
+    contestants = []
+    flop = p.make_card(flop)
+    turn = p.make_card(turn)
+    river = p.make_card(river)
+    passed_flop_stable = [card for card in flop]
+    for n in range(opponents):
+        player_name = 'opponent' + str(n+1)
+        player_name = Player(n, contestant_hands[n])
+        contestants.append(player_name)
+    i = 0
+    passed_board = len(flop) + len(turn) + len(river)
+    full_board = 5
+    k = full_board - passed_board
+    for i in range(sims):
+        deck = p.generate_deck()
+        for contestant in contestants:
+            if len(contestant.cards) == 2:
+                contestant.starting_cards = True
+                for card in contestant.cards:
+                    deck.update_deck(card)  # remove known hole cards from deck
+            else:
+                contestant.starting_cards = False
+                hole_cards = []
+                for j in range(2):
+                    deal, deck = deck.deal_card()
+                    hole_cards.append(deal)
+                contestant.cards = hole_cards #  assign new hole cards if not passed
+        for l in range(k):  # complete the board as needed
+            deal, deck = deck.deal_card()
+            flop.append(deal)
+        for contestant in contestants:
+            hand = evaluate_hand(contestant.cards, flop, turn, river)
+            contestant.hand = hand
+        #  Compare hand values in contestants
+        #  TODO Build out comparing lows and kickers
+        high_hand = max(contestants, key=lambda x: x.hand.hand_value) # contestant with highest hand
+        player_numbers = [player.number for player in contestants]
+        index = player_numbers.index(high_hand.number)
+        contestants[index].wins += 1
+        i +=1
+        flop = [card for card in passed_flop_stable] # revert to starting state
+        for contestant in contestants:
+            if contestant.starting_cards is False:  # revert to starting state
+                contestant.cards = []
+        hole_cards = []
+    return contestants
 
 
 #####     MATH     #####

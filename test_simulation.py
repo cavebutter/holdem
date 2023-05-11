@@ -1,3 +1,5 @@
+import poker_functions
+import simulation
 import simulation as s
 
 
@@ -59,3 +61,27 @@ def test_invalid_card():
     check = hand11 + flop11 + turn11 + river11
     valid = s.validate_card(check)
     assert not valid
+
+
+def test_player_create():
+    player = s.Player(1, ['Ac', 'Ad'])
+    assert type(player) == simulation.Player
+
+
+def test_player_cards():
+    player = s.Player(1, ['Ac', 'Ad'])
+    assert type(player.cards[0]) == poker_functions.Card
+
+
+def test_player_no_cards():
+    player = s.Player(2)
+    assert player
+
+def test_multiplayer_create_players():
+    foo = s.multiplayer(['As', '9d'], opponents=3)
+    assert len(foo) == 3
+
+
+def test_multiplayer_with_hole_cards():
+    foo = s.multiplayer(['As', '9d'], ['Kd', 'Th'], opponents=2)
+    assert len(foo[1].cards) == 2

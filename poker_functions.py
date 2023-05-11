@@ -135,7 +135,9 @@ def register(func):
 def make_card(input_list):
     """Input_list is either a list of Card objects or string Objects.  If Cards, return the cards.
       If string, convert to Card and return"""
-    if isinstance(input_list[0], Card):
+    if len(input_list) == 0:
+        return input_list
+    elif isinstance(input_list[0], Card):
         return input_list
     else:
         card_list = [Card(card) for card in input_list]
@@ -251,7 +253,7 @@ def find_full_house(hand, board):
     values = [card.value for card in total_hand]
     c = Counter(values)
     for value in set(values):
-        if c[value] == 3: # This looks overly indented but should offer early exit if there is no 3OK
+        if c[value] == 3:
             high_value = value
             c.pop(value)
             for value in set(values):
@@ -296,7 +298,6 @@ def find_straight(hand, board):
     reqd_hand_size = 5  # required hand size gives us some flexibility at the cost of more lines.  could be more efficient if we say 'if len(values)<5'
     total_hand = hand + board
     values = [*set(card.value for card in total_hand)]
-    # total_hand_values = [card.value for card in total_hand]
     slices = len(values) - reqd_hand_size
     if slices < 0:
         return straight
