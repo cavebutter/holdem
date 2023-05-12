@@ -63,6 +63,76 @@ def evaluate_hand(hole_cards, flop=[], turn=[], river=[]):
             else:
                 return func
 
+
+def score_game(contestants):
+    #  TODO make this more elegant
+    """Application will determine the highest hand, including low and kicker for each player in player_list"""
+    high = ['flush', 'straight', 'straight_flush']
+    kick = ['4ok']
+    hi_lo = ['boat']
+    hi_lo_kick = ['2pair', 'hc', '3ok', 'pair']
+    high_hand = max(contestants, key=lambda x: x.hand.hand_value)  # contestant with highest hand
+    same_high_hand = [player for player in contestants if player.hand.hand_value == high_hand.hand.hand_value]
+    if len(same_high_hand) == 1:
+        same_high_hand[0].wins += 1
+        return contestants
+    elif high_hand.hand.type in high:
+        high_card = max(same_high_hand, key=lambda x: x.hand.high_value)
+        same_high_card = [player for player in same_high_hand if player.hand.high_value == high_card.hand.high_value]
+        if len(same_high_card) == 1:
+            high_card.wins += 1
+            return contestants
+        else:
+            return contestants
+    elif high_hand.hand.type in hi_lo:
+        over = max(same_high_hand, key=lambda x: x.hand.high_value) # Highest pair in hand
+        same_over = [player for player in same_high_hand if player.hand.high_value == over.hand.high_value]
+        if len(same_over) == 1:
+            over.wins += 1
+            return contestants
+        else:
+            under = max(same_over, key=lambda x: x.hand.low_value) # lowest pair in hand
+            same_under = [player for player in same_over if player.hand.low_value == under.hand.low_value]
+            if len(same_under) == 1:
+                under.wins += 1
+                return contestants
+            else:
+                return contestants
+    elif high_hand.hand.type in hi_lo_kick:
+        over = max(same_high_hand, key=lambda x: x.hand.high_value)  # Highest pair in hand
+        same_over = [player for player in same_high_hand if player.hand.high_value == over.hand.high_value]
+        if len(same_over) == 1:
+            over.wins += 1
+            return contestants
+        else:
+            under = max(same_over, key=lambda x: x.hand.low_value)  # lowest pair in hand
+            same_under = [player for player in same_over if player.hand.low_value == under.hand.low_value]
+            if len(same_under) == 1:
+                under.wins += 1
+                return contestants
+            else:
+                kicker = max(same_under, key=lambda x: x.hand.kicker)
+                same_kicker = [player for player in same_under if player.hand.kicker == kicker.hand.kicker]
+                if len(same_kicker) == 1:
+                    kicker.wins += 1
+                    return contestants
+                else:
+                    return contestants
+    elif high_hand.hand.type in kick:
+        kicker = max(same_high_hand, key=lambda x: x.hand.kicker)
+        same_kicker = [player for player in same_high_hand if player.hand.kicker == kicker.hand.kicker]
+        if len(same_kicker) == 1:
+            kicker.wins += 1
+            return contestants
+        else:
+            return contestants
+
+
+    # player_numbers = [player.number for player in contestants]
+    # index = player_numbers.index(high_hand.number)
+    # contestants[index].wins += 1
+    # return contestants
+
 def simulation_one_player(hole, flop=[], turn=[], river=[], sims=100000):
     full_board = 7 # number of cards required to run sim
     passed_cards = len(hole) + len(flop) + len(turn) + len(river)
@@ -131,7 +201,7 @@ def multiplayer(hole_one, hole_two=[], hole_three=[], hole_four=[], hole_five=[]
     k = full_board - passed_board
     for i in range(sims):
         deck = p.generate_deck()
-        for contestant in contestants:
+        for contestant in contestants:  # TODO move assigning Player.starting_cards to init
             if len(contestant.cards) == 2:
                 contestant.starting_cards = True
                 for card in contestant.cards:
@@ -156,9 +226,10 @@ def multiplayer(hole_one, hole_two=[], hole_three=[], hole_four=[], hole_five=[]
         index = player_numbers.index(high_hand.number)
         contestants[index].wins += 1
         i +=1
-        flop = [card for card in passed_flop_stable] # revert to starting state
+        #  Revert to starting state
+        flop = [card for card in passed_flop_stable]
         for contestant in contestants:
-            if contestant.starting_cards is False:  # revert to starting state
+            if contestant.starting_cards is False:
                 contestant.cards = []
         hole_cards = []
     return contestants

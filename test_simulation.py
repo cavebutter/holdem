@@ -1,5 +1,4 @@
 import poker_functions
-import simulation
 import simulation as s
 
 
@@ -65,7 +64,7 @@ def test_invalid_card():
 
 def test_player_create():
     player = s.Player(1, ['Ac', 'Ad'])
-    assert type(player) == simulation.Player
+    assert type(player) == s.Player
 
 
 def test_player_cards():
@@ -85,3 +84,157 @@ def test_multiplayer_create_players():
 def test_multiplayer_with_hole_cards():
     foo = s.multiplayer(['As', '9d'], ['Kd', 'Th'], opponents=2)
     assert len(foo[1].cards) == 2
+
+
+def test_score_game_single_winner():
+    player0 = s.Player(0)
+    player1 = s.Player(1)
+    player2 = s.Player(2)
+
+    player0.hand = poker_functions.Hand('3ok', 8, kicker=10)
+    player1.hand = poker_functions.Hand('hc', 13, 10, 9)
+    player2.hand = poker_functions.Hand('pair', 8, kicker=12)
+
+    contestants = [player0, player1, player2]
+
+    foo = s.score_game(contestants)
+
+    assert foo[0].wins == 1
+
+
+def test_score_game_high_winner():
+    """More than 1 hand has a straight, flush or straight flush.  High card wins"""
+    player0 = s.Player(0)
+    player1 = s.Player(1)
+    player2 = s.Player(2)
+
+    player0.hand = poker_functions.Hand('flush', 13)
+    player1.hand = poker_functions.Hand('flush', 9)
+    player2.hand = poker_functions.Hand('pair', 8, kicker=12)
+
+    contestants = [player0, player1, player2]
+
+    foo = s.score_game(contestants)
+
+    assert foo[0].wins == 1
+
+
+def test_score_game_high_chop():
+    """More than 1 hand has a straight, flush or straight flush.  Draw."""
+    player0 = s.Player(0)
+    player1 = s.Player(1)
+    player2 = s.Player(2)
+
+    player0.hand = poker_functions.Hand('flush', 13)
+    player1.hand = poker_functions.Hand('flush', 13)
+    player2.hand = poker_functions.Hand('pair', 8, kicker=12)
+
+    contestants = [player0, player1, player2]
+
+    foo = s.score_game(contestants)
+
+    assert foo[0].wins == 0 and foo[1].wins == 0
+
+
+def test_score_game_boat_high_plays():
+    """More than 1 hand has a straight, flush or straight flush.  High card wins"""
+    player0 = s.Player(0)
+    player1 = s.Player(1)
+    player2 = s.Player(2)
+
+    player0.hand = poker_functions.Hand('boat', 13, 5)
+    player1.hand = poker_functions.Hand('boat', 9, 6)
+    player2.hand = poker_functions.Hand('pair', 8, kicker=12)
+
+    contestants = [player0, player1, player2]
+
+    foo = s.score_game(contestants)
+
+    assert foo[0].wins == 1
+
+
+def test_score_game_boat_low_plays():
+    """More than 1 hand has a straight, flush or straight flush.  High card wins"""
+    player0 = s.Player(0)
+    player1 = s.Player(1)
+    player2 = s.Player(2)
+
+    player0.hand = poker_functions.Hand('boat', 13, 5)
+    player1.hand = poker_functions.Hand('boat', 13, 6)
+    player2.hand = poker_functions.Hand('pair', 8, kicker=12)
+
+    contestants = [player0, player1, player2]
+
+    foo = s.score_game(contestants)
+
+    assert foo[1].wins == 1
+
+
+
+def test_score_game_hi_lo_kick_clear_hi_winner():
+    """More than 1 hand has a straight, flush or straight flush.  High card wins"""
+    player0 = s.Player(0)
+    player1 = s.Player(1)
+    player2 = s.Player(2)
+
+    player0.hand = poker_functions.Hand('boat', 13, 5)
+    player1.hand = poker_functions.Hand('boat', 10, 6)
+    player2.hand = poker_functions.Hand('pair', 8, kicker=12)
+
+    contestants = [player0, player1, player2]
+
+    foo = s.score_game(contestants)
+
+    assert foo[0].wins == 1
+
+
+def test_score_game_hi_lo_kick_lo_winner():
+    """More than 1 hand has trips.  Fourth card plays"""
+    player0 = s.Player(0)
+    player1 = s.Player(1)
+    player2 = s.Player(2)
+
+    player0.hand = poker_functions.Hand('3ok', 13, 5, 3)
+    player1.hand = poker_functions.Hand('3ok', 10, 6, 5)
+    player2.hand = poker_functions.Hand('pair', 8, kicker=12)
+
+    contestants = [player0, player1, player2]
+
+    foo = s.score_game(contestants)
+
+    assert foo[0].wins == 1
+
+
+def test_score_game_hi_lo_kick_kicker_winner():
+    """More than 1 hand has trips.  Fifth card plays """
+    player0 = s.Player(0)
+    player1 = s.Player(1)
+    player2 = s.Player(2)
+
+    player0.hand = poker_functions.Hand('3ok', 13, 5, 3)
+    player1.hand = poker_functions.Hand('3ok', 13, 5, 4)
+    player2.hand = poker_functions.Hand('pair', 8, kicker=12)
+
+    contestants = [player0, player1, player2]
+
+    foo = s.score_game(contestants)
+
+    assert foo[1].wins == 1
+
+
+
+def test_score_game_kicker_winner():
+    """More than 1 hand has trips.  Fifth card plays """
+    player0 = s.Player(0)
+    player1 = s.Player(1)
+    player2 = s.Player(2)
+
+    player0.hand = poker_functions.Hand('4ok', 5, kicker=3)
+    player1.hand = poker_functions.Hand('4ok', 5, kicker=4)
+    player2.hand = poker_functions.Hand('pair', 8, kicker=12)
+
+    contestants = [player0, player1, player2]
+
+    foo = s.score_game(contestants)
+
+    assert foo[1].wins == 1

@@ -170,15 +170,17 @@ def find_multiple(hand, board, n=2):
             multiple = True
             hand_type = 'pair'
             high_value = value
-            kicker = max([value for value in values if value != high_value])
-            multiple_hand = Hand(hand_type, high_value, kicker=kicker)
+            low_value = max([value for value in values if value != high_value])
+            kicker = max([value for value in values if value not in [high_value, low_value]])
+            multiple_hand = Hand(hand_type, high_value, low_value=low_value, kicker=kicker)
             return multiple_hand
         elif c[value] == 3 and n == 3:
             multiple = True
             hand_type = '3ok'
             high_value = c[value]
-            kicker = max([value for value in values if value != high_value])
-            multiple_hand = Hand(hand_type, high_value, kicker)
+            low_value = max([value for value in values if value != high_value])
+            kicker = max([value for value in values if value not in [high_value, low_value]])
+            multiple_hand = Hand(hand_type, high_value, low_value=low_value, kicker=kicker)
             return multiple_hand
         elif c[value] == 4 and n == 4:
             multiple = True
