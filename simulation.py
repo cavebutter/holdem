@@ -127,12 +127,6 @@ def score_game(contestants):
         else:
             return contestants
 
-
-    # player_numbers = [player.number for player in contestants]
-    # index = player_numbers.index(high_hand.number)
-    # contestants[index].wins += 1
-    # return contestants
-
 def simulation_one_player(hole, flop=[], turn=[], river=[], sims=100000):
     full_board = 7 # number of cards required to run sim
     passed_cards = len(hole) + len(flop) + len(turn) + len(river)
@@ -221,10 +215,11 @@ def multiplayer(hole_one, hole_two=[], hole_three=[], hole_four=[], hole_five=[]
             contestant.hand = hand
         #  Compare hand values in contestants
         #  TODO Build out comparing lows and kickers
-        high_hand = max(contestants, key=lambda x: x.hand.hand_value) # contestant with highest hand
-        player_numbers = [player.number for player in contestants]
-        index = player_numbers.index(high_hand.number)
-        contestants[index].wins += 1
+        contestants = score_game(contestants)
+        # high_hand = max(contestants, key=lambda x: x.hand.hand_value) # contestant with highest hand
+        # player_numbers = [player.number for player in contestants]
+        # index = player_numbers.index(high_hand.number)
+        # contestants[index].wins += 1
         i +=1
         #  Revert to starting state
         flop = [card for card in passed_flop_stable]
