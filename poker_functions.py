@@ -47,7 +47,7 @@ class Card:
 
 @dataclass()
 class Hand:
-    def __init__(self, type, high_value, low_value = 0, kicker=None):
+    def __init__(self, type, high_value, low_value = 0, kicker=0):
         """Type = name of hand (e.g. Pair)
         value = value of the hand (i.e. Straight Flush is the most valuable)
         high_value = value.  either the high card in straight or flush, the set in full house, the top pair in 2pair, etc
@@ -186,8 +186,8 @@ def find_multiple(hand, board, n=2):
             multiple = True
             hand_type = '4ok'
             high_value = value
-            kicker = max([value for value in values if value != high_value])
-            multiple_hand = Hand(hand_type, high_value, kicker)
+            low_value = max([value for value in values if value != high_value])
+            multiple_hand = Hand(hand_type, high_value, low_value=low_value)
             return multiple_hand
     return multiple
 

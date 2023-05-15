@@ -101,8 +101,13 @@ def test_player_no_cards():
     player = s.Player(2)
     assert player
 
-def test_multiplayer_create_players():
+def test_multiplayer_create_players_no_hole_cards():
     foo = s.multiplayer(['As', '9d'], opponents=3)
+    assert len(foo) == 3
+
+
+def test_multiplayer_create_players_with_hole_cards():
+    foo = s.multiplayer(['As', '9d'], ['Jd', '8c'], ['6h', 'Kh'], opponents=3)
     assert len(foo) == 3
 
 
@@ -247,18 +252,24 @@ def test_score_game_hi_lo_kick_kicker_winner():
     assert foo[1].wins == 1
 
 
-
-def test_score_game_kicker_winner():
-    """More than 1 hand has trips.  Fifth card plays """
+@pytest.fixture
+def quad_showdown():
+    """More than 1 hand has quads.  Fifth card plays """
     player0 = s.Player(0)
     player1 = s.Player(1)
     player2 = s.Player(2)
 
-    player0.hand = poker_functions.Hand('4ok', 5, kicker=3)
-    player1.hand = poker_functions.Hand('4ok', 5, kicker=4)
-    player2.hand = poker_functions.Hand('pair', 8, kicker=12)
+    player0.hand = poker_functions.Hand('4ok', 5, low_value=3)
+    player1.hand = poker_functions.Hand('4ok', 5, low_value=4)
+    player2.hand = poker_functions.Hand('pair', 8, low_value=12, kicker=9)
 
     contestants = [player0, player1, player2]
+    return contestants
+
+
+def test_score_game_kicker_winner(quad_showdown):
+
+    contestants = quad_showdown
 
     foo = s.score_game(contestants)
 

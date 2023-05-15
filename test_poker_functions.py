@@ -89,17 +89,25 @@ def non_seq_straight():
     return hand7, board
 
 
-# Straight, 5 card
-hand8 = ['2c', '2s']
-flop8 = ['6h', '3c', '3d']
-turn8 = ['4h']
-river8 = ['5s']
+@pytest.fixture
+def straight_five_card():
+    # Straight, 5 card
+    hand8 = ['2c', '2s']
+    flop8 = ['6h', '3c', '3d']
+    turn8 = ['4h']
+    river8 = ['5s']
+    board = flop8 + turn8 + river8
+    return hand8, board
 
+@pytest.fixture
+def straight_six_card():
 # Straight, 6 card
-hand9 = ['2c', '7s']
-flop9 = ['Jh', '3c', '6d']
-turn9 = ['4h']
-river9 = ['5s']
+    hand = ['2c', '7s']
+    flop9 = ['Jh', '3c', '6d']
+    turn9 = ['4h']
+    river9 = ['5s']
+    board = flop9 + turn9 + river9
+    return hand, board
 
 #  Duplicated Card
 hand10 = ['3c', 'As']
@@ -115,11 +123,15 @@ turn11 = ['4s']
 river11 = ['Ss']
 
 
-#  Wheel
-hand12 = ['Ac', 'Td']
-flop12 = ['2c', '3h', 'Qs']
-turn12 = ['4s']
-river12 = ['5d']
+@pytest.fixture
+def wheel():
+    #  Wheel
+    hand12 = ['Ac', 'Td']
+    flop12 = ['2c', '3h', 'Qs']
+    turn12 = ['4s']
+    river12 = ['5d']
+    board = flop12 + turn12 + river12
+    return  hand12, board
 
 
 @pytest.fixture
@@ -284,8 +296,9 @@ def test_not_one_pair(straight_no_pair_no_flush):
     pair = p.find_pair(hand, board)
     assert not pair
 
-def test_not_two_pair():
-    board3 = flop3 + turn3 + river3
+def test_not_two_pair(straight_no_pair_no_flush):
+    board3 = straight_no_pair_no_flush[1]
+    hand3 = straight_no_pair_no_flush[0]
     two_pair = p.find_two_pair(hand3, board3)
     assert not two_pair
 
@@ -316,11 +329,13 @@ def test_not_3ok(two_pair):
     three_o_kind = p.find_trips(hand1, board1)
     assert not three_o_kind
 
+
 def test_3ok_type(three_of_a_kind):
     board = three_of_a_kind[1]
     hand = three_of_a_kind[0]
     three_o_kind_hand = p.find_trips(hand, board)
     assert three_o_kind_hand.type == '3ok'
+
 
 def test_3ok_high_value(three_of_a_kind):
     board = three_of_a_kind[1]
@@ -355,15 +370,41 @@ def test_straight_non_sequential(non_seq_straight):
     straight_hand = p.find_straight(hand7, board7)
     assert straight_hand.high_rank == '6'
 
-def test_straight_5_card():
-    board8 = flop8 + turn8 + river8
-    straight_hand = p.find_straight(hand8, board8)
-    assert straight_hand.kicker is None
 
-def test_straight_6_card():
-    board9 = flop9 + turn9 + river9
+def test_straight_5_card_type(straight_five_card):
+    board8 = straight_five_card[1]
+    hand8 = straight_five_card[0]
+    straight_hand = p.find_straight(hand8, board8)
+    assert straight_hand.type == 'straight'
+
+
+def test_straight_5_card_high(straight_five_card):
+    board8 = straight_five_card[1]
+    hand8 = straight_five_card[0]
+    straight_hand = p.find_straight(hand8, board8)
+    assert straight_hand.high_value == 6
+
+
+def test_straight_5_card_low(straight_five_card):
+    board8 = straight_five_card[1]
+    hand8 = straight_five_card[0]
+    straight_hand = p.find_straight(hand8, board8)
+    assert straight_hand.low_value == 0
+
+
+def test_straight_5_card_kicker(straight_five_card):
+    board8 = straight_five_card[1]
+    hand8 = straight_five_card[0]
+    straight_hand = p.find_straight(hand8, board8)
+    assert straight_hand.kicker == 0
+
+
+def test_straight_6_card(straight_six_card):
+    board9 = straight_six_card[1]
+    hand9 = straight_six_card[0]
     straight_hand = p.find_straight(hand9, board9)
     assert straight_hand.high_value == 7
+
 
 def test_not_straight(two_pair):
     board4 = two_pair[1]
@@ -372,8 +413,9 @@ def test_not_straight(two_pair):
     assert not straight
 
 
-def test_straight_wheel():
-    board12 = flop12 + turn12 + river12
+def test_straight_wheel(wheel):
+    board12 = wheel[1]
+    hand12 = wheel[0]
     straight_hand = p.find_straight(hand12, board12)
     assert straight_hand.high_rank == '5'
 

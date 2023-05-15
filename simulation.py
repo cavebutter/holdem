@@ -65,7 +65,7 @@ def evaluate_hand(hole_cards, flop=[], turn=[], river=[]):
 
 
 def score_game(contestants):
-    #  TODO make this more elegant
+    #  TODO make this more elegant by functionizing repeated code.
     """Application will determine the highest hand, including low and kicker for each player in player_list"""
     high = ['flush', 'straight', 'straight_flush']
     kick = ['4ok']
@@ -119,13 +119,14 @@ def score_game(contestants):
                 else:
                     return contestants
     elif high_hand.hand.type in kick:
-        kicker = max(same_high_hand, key=lambda x: x.hand.kicker)
-        same_kicker = [player for player in same_high_hand if player.hand.kicker == kicker.hand.kicker]
-        if len(same_kicker) == 1:
-            kicker.wins += 1
+        low_val = max(same_high_hand, key=lambda x: x.hand.low_value)
+        same_low_val = [player for player in same_high_hand if player.hand.low_value == low_val.hand.low_value]
+        if len(same_low_val) == 1:
+            low_val.wins += 1
             return contestants
         else:
             return contestants
+
 
 def simulation_one_player(hole, flop=[], turn=[], river=[], sims=100000):
     full_board = 7 # number of cards required to run sim
@@ -150,7 +151,7 @@ def simulation_one_player(hole, flop=[], turn=[], river=[], sims=100000):
         j = full_board - passed_cards
         for k in range(j):  # Add additional cards to make a full board of 7
             deal, deck = deck.deal_card()
-            flop.append(deal)  # Adding to flop because it shouldn't matter
+            flop.append(deal)  # Adding to flop because it shouldn't matter, will revert flop back at end of loop
         hand = evaluate_hand(hole, flop, turn, river)
         if hand.type == 'straight_flush':
             straight_flushes += 1
@@ -214,13 +215,8 @@ def multiplayer(hole_one, hole_two=[], hole_three=[], hole_four=[], hole_five=[]
             hand = evaluate_hand(contestant.cards, flop, turn, river)
             contestant.hand = hand
         #  Compare hand values in contestants
-        #  TODO Build out comparing lows and kickers
         contestants = score_game(contestants)
-        # high_hand = max(contestants, key=lambda x: x.hand.hand_value) # contestant with highest hand
-        # player_numbers = [player.number for player in contestants]
-        # index = player_numbers.index(high_hand.number)
-        # contestants[index].wins += 1
-        i +=1
+        i += 1
         #  Revert to starting state
         flop = [card for card in passed_flop_stable]
         for contestant in contestants:
