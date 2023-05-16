@@ -102,17 +102,17 @@ def test_player_no_cards():
     assert player
 
 def test_multiplayer_create_players_no_hole_cards():
-    foo = s.multiplayer(['As', '9d'], opponents=3)
+    foo = s.simulation_multiplayer(['As', '9d'], opponents=3)
     assert len(foo) == 3
 
 
 def test_multiplayer_create_players_with_hole_cards():
-    foo = s.multiplayer(['As', '9d'], ['Jd', '8c'], ['6h', 'Kh'], opponents=3)
+    foo = s.simulation_multiplayer(['As', '9d'], ['Jd', '8c'], ['6h', 'Kh'], opponents=3)
     assert len(foo) == 3
 
 
 def test_multiplayer_with_hole_cards():
-    foo = s.multiplayer(['As', '9d'], ['Kd', 'Th'], opponents=2)
+    foo = s.simulation_multiplayer(['As', '9d'], ['Kd', 'Th'], opponents=2)
     assert len(foo[1].cards) == 2
 
 

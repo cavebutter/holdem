@@ -9,26 +9,40 @@ if __name__ == '__main__':
         description="Odds and Probabilities for Your Hold 'Em Hand",
     )
 
-    parser.add_argument('-c', '--Hole_Cards', nargs=2, metavar="Hole Cards", default=[], help="Your two hole cards")
+    parser.add_argument('-c', '--Hole_Cards', nargs=2, metavar="Hole Cards", default=[], help="Single player.  These are your hole cards")
     parser.add_argument('-f', '--flop', nargs=3, metavar="Flop", default=[], help="The three cards for the flos.  Defaults to blank")
     parser.add_argument('-t', '--turn', nargs=1, metavar="Turn", default=[], help="The card for the turn.  Defaults to blank")
     parser.add_argument('-r', '--river', nargs=1, metavar="River", default=[], help="The card for the river.  Defaults to blank")
-    parser.add_argument('-o', '--outs', nargs=1, metavar="Outs", default=0, help="Optional, instead of a hand, pass the "
-                                                                                 "number of outs.")
+    # parser.add_argument('-o', '--outs', nargs=1, metavar="Outs", default=0,
+    #                     help="Optional, instead of a hand, pass the number of outs.")
+    parser.add_argument('-m', '--multiplayer', nargs=2, metavar="Multiplayer",
+                        help="Multiplayer. Your hole cards are required.  Other players' are not.")
+    parser.add_argument('-p', '--players', nargs=1, metavar="Players", dest= 'opponents', default=2,
+                        help="Number of players in multiplayer (-m) hand.  Must be <= hole card pairs.", type=int)
+    parser.add_argument('--two', nargs= 2, metavar="Player two", default=[],
+                        help="Player two's hole cards. '-p' value must be at least 2.")
+    parser.add_argument('--three', nargs=2, metavar="Player three", default=[],
+                        help="Player three's hole cards. '-p' value must be at least 3.")
+    parser.add_argument('--four', nargs=2, metavar="Player four", default=[],
+                        help="Player four's hole cards. '-p' value must be at least 4.")
+    parser.add_argument('--five', nargs=2, metavar="Player five", default=[],
+                        help="Player five's hole cards. '-p' value must be at least 5.")
+    parser.add_argument('--six', nargs=2, metavar="Player six", default=[],
+                        help="Player six's hole cards. '-p' value must be at least 6.")
 
     args = parser.parse_args()
 
     board = args.flop + args.turn + args.river
     #  Validate arguments
-    check = board + args.Hole_Cards
+    check = board + args.Hole_Cards + args.two + args.three + args.four + args.five + args.six + args.multiplayer
     duplicate = s.dedupe(check)
     if duplicate:
         print("There is a duplicate card.  Please check the board and your hand and try again")
         sys.exit()
     valid = s.validate_card(check)
     if not valid:
-            print("At least one of your cards is not valid.  Please try again.")
-            sys.exit()
+        print("At least one of your cards is not valid.  Please try again.")
+        sys.exit()
     board_str = ''
     for card in board:
         board_str += card + ' '
@@ -70,10 +84,17 @@ if __name__ == '__main__':
         print("We ran your hand and board 100,000 times.  Here's the odds:\n")
         print(odds)
 
-    elif args.outs != []:
-        outs = args.outs[0]
-        x = PrettyTable()
-        x.field_names = ['Outs', 'Turn Odds', 'River Odds', 'Turn+River Odds']
-        x.add_row([outs, s.outs[outs][0], s.outs[outs][1],s.outs[outs][2]])
+    # elif args.outs != []:
+    #     outs = args.outs[0]
+    #     x = PrettyTable()
+    #     x.field_names = ['Outs', 'Turn Odds', 'River Odds', 'Turn+River Odds']
+    #     x.add_row([outs, s.outs[outs][0], s.outs[outs][1],s.outs[outs][2]])
+    #
+    #     print(x)
 
-        print(x)
+    elif len(args.multiplayer) > 0:
+        game = s.simulation_multiplayer(args.multiplayer, hole_two=args.two, hole_three=args.three, hole_four=args.four,
+                                        hole_five=args.five, hole_six=args.six, flop=args.flop, turn=args.turn,
+                                        river=args.river, opponents=args.opponents[0])
+        win_pct = s.percent(game[0].wins,10000)
+        print(f"Hero's hand will win {win_pct} percent of the time")

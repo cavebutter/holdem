@@ -178,8 +178,8 @@ def simulation_one_player(hole, flop=[], turn=[], river=[], sims=100000):
     return sims, high_cards, pairs, two_pairs, trips, straights, flushes, boats, quads, straight_flushes
 
 
-def multiplayer(hole_one, hole_two=[], hole_three=[], hole_four=[], hole_five=[], hole_six=[],
-                flop = [], turn = [], river = [], opponents=2, sims=10000):
+def simulation_multiplayer(hole_one, hole_two=[], hole_three=[], hole_four=[], hole_five=[], hole_six=[],
+                           flop = [], turn = [], river = [], opponents=2, sims=10000):
     contestant_hands = [hole_one, hole_two, hole_three, hole_four, hole_five, hole_six]
     contestants = []
     flop = p.make_card(flop)
@@ -225,6 +225,9 @@ def multiplayer(hole_one, hole_two=[], hole_three=[], hole_four=[], hole_five=[]
         hole_cards = []
     return contestants
 
+
+
+#  TODO for single and mult: find and return most likely hand.  Return number of outs and odds.
 
 #####     MATH     #####
 def percent(hits, sims):
