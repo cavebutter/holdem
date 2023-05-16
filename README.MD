@@ -1,17 +1,12 @@
 # Holdem Percentage Odds and Ratios Calculator
 
 Command line application (for now).  There are two flows:
-* Simple Outs and Odds
-* Monte Carlo Simulation with Percentages and Odds for a Given Hand/Board combination
-
-## Outs and Odds
-Tell the application the number of outs you have to improve your hand, and the application will return the odds of
-improving on the turn, river, and turn+river.
-#### Usage
-`python holdem.py -o N` where `N` is the number of outs.
+* Single Player Monte Carlo Simulation
+* Multiplayer Win Expectancy
 
 
-## Monte Carlo Simulation
+
+## Single Player Monte Carlo Simulation
 Tell the application your hole cards and board as flop, turn, and river.  The application will run 100,000 
 simulations of that hand and return the percentage and odds of improving to any poker hand.
 #### Usage
@@ -20,10 +15,24 @@ simulations of that hand and return the percentage and odds of improving to any 
 Card ranks must be 2-9, T, J, K, Q, A.  Ranks are case sensitive.
 Suits are c, d, h, s.  Suits are case sensitive.
 
-`-c` is the flag for your hole cards.  These must be separated by a space.
+`-c` is the flag for your hole cards and to indicate Single Player mode.  These must be separated by a space.
 
 `-f` or `--flop` is the optional flag for flop.  Three cards separated by a space.
 
 `-t` or `--turn` is the optional flag for turn.  One card.
 
 `-r` or `--river` is the optional flag for river.  One card.
+
+#### Sample Output
+![image](single_player.png)
+
+## Multiplayer Win Expectancy
+Tell the application your hole cards and board (as flop, turn, and river) and total number of players in the hand.
+
+`-m` is the flag to indicate multiplayer mode.  The hero's hole cards (2) are required arguments.
+
+`-p`  or `--players` is the flag to indicate the total number of players in the hand. This is a required argument, maximum of 6 players.
+
+`--two` through `--six` are optional flags to indicate the hands of players other than the hero.  2 cards each.
+
+Returns win expectancy for the hero.
