@@ -49,7 +49,6 @@ class Card:
 class Hand:
     def __init__(self, type, high_value, low_value = 0, kicker=0):
         """Type = name of hand (e.g. Pair)
-        value = value of the hand (i.e. Straight Flush is the most valuable)
         high_value = value.  either the high card in straight or flush, the set in full house, the top pair in 2pair, etc
         low_value = the lower pair in 2 pair or the pair in a full house
         kicker = value of the kicker in the hand.  Can be null

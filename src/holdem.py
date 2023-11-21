@@ -1,5 +1,5 @@
 import sys
-import simulation as s
+import src.simulation as s
 import argparse
 from prettytable import PrettyTable
 

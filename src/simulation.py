@@ -1,4 +1,4 @@
-import poker_functions as p
+import src.poker_functions as p
 from fractions import Fraction
 from collections import Counter
 
