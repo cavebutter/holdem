@@ -129,6 +129,20 @@ def score_game(contestants):
 
 
 def simulation_one_player(hole, flop=[], turn=[], river=[], sims=100000):
+    """
+    Simulates a single player's hand in a poker game.
+
+    Args:
+        hole (list): The player's hole cards.
+        flop (list, optional): The cards on the flop. Defaults to an empty list.
+        turn (list, optional): The card on the turn. Defaults to an empty list.
+        river (list, optional): The card on the river. Defaults to an empty list.
+        sims (int, optional): The number of simulations to run. Defaults to 100000.
+
+    Returns:
+        tuple: A tuple containing the number of simulations, the count of each hand type
+            (high_cards, pairs, two_pairs, trips, straights, flushes, boats, quads, straight_flushes).
+    """
     full_board = 7 # number of cards required to run sim
     passed_cards = len(hole) + len(flop) + len(turn) + len(river)
     passed_flop = [item for item in flop]
@@ -180,6 +194,25 @@ def simulation_one_player(hole, flop=[], turn=[], river=[], sims=100000):
 
 def simulation_multiplayer(hole_one, hole_two=[], hole_three=[], hole_four=[], hole_five=[], hole_six=[],
                            flop = [], turn = [], river = [], opponents=2, sims=10000):
+    """
+    Simulates a multiplayer poker game with the given parameters.
+
+    Args:
+        hole_one (list): The hole cards for the first player.
+        hole_two (list, optional): The hole cards for the second player. Defaults to an empty list.
+        hole_three (list, optional): The hole cards for the third player. Defaults to an empty list.
+        hole_four (list, optional): The hole cards for the fourth player. Defaults to an empty list.
+        hole_five (list, optional): The hole cards for the fifth player. Defaults to an empty list.
+        hole_six (list, optional): The hole cards for the sixth player. Defaults to an empty list.
+        flop (list, optional): The flop cards. Defaults to an empty list.
+        turn (list, optional): The turn card. Defaults to an empty list.
+        river (list, optional): The river card. Defaults to an empty list.
+        opponents (int, optional): The number of opponents in the game. Defaults to 2.
+        sims (int, optional): The number of simulations to run. Defaults to 10000.
+
+    Returns:
+        list: A list of Player objects representing the contestants in the game.
+    """
     contestant_hands = [hole_one, hole_two, hole_three, hole_four, hole_five, hole_six]
     contestants = []
     flop = p.make_card(flop)
