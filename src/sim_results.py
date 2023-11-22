@@ -3,6 +3,17 @@ from prettytable import PrettyTable
 
 
 def single_hand_eval(hand, board):
+    """
+    Simulate the odds of each possible final hand, given a player's hand and board.
+    Returns a PrettyTable with the results.
+
+    Parameters:
+    - hand (list): A list of two strings representing the player's hand.
+    - board (list): A list of strings representing the cards on the board.
+
+    Returns:
+    - return_text (str): A string containing the odds of different final hands after running simulations.
+    """
     board_str = ''
     for card in board:
         board_str += card + ' '
@@ -49,12 +60,33 @@ def single_hand_eval(hand, board):
 
 
 def multi_hand_eval(hole_one, opponents, board=[], sims=10000):
+    """
+    Calculates the win percentage of the hero's hand in a multiplayer poker game.
+
+    Parameters:
+        hole_one (str): The hero's first hole card.
+        opponents (List[str]): The list of opponents' hole cards.
+        board (List[str], optional): The community cards on the board. Defaults to an empty list.
+        sims (int, optional): The number of simulations to run. Defaults to 10000.
+
+    Returns:
+        str: A formatted string representing the win percentage of the hero's hand.
+    """
     sim = s.simulation_multiplayer(hole_one, board, opponents=opponents, sims=sims)
     win_pct = s.percent(sim[0].wins, 10000)
     return_text = f"Hero's hand will win {win_pct}% of the time."
     return return_text
 
 def hand_and_win_prob(hand, board, opponents, sims=10000):
+    """
+    Combines single_hand_eval and multi_hand_eval into one function.
+
+    :param hand:
+    :param board:
+    :param opponents:
+    :param sims:
+    :return:
+    """
     foo = single_hand_eval(hand, board)
     bar = multi_hand_eval(hand, opponents, board, sims)
     return_text = foo + "\n" + bar

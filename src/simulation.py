@@ -4,7 +4,18 @@ from collections import Counter
 
 
 class Player:
+
     def __init__(self, number, cards=[]):
+        """
+        Initializes a new instance of the class.
+
+        Parameters:
+            number (int): The number of the instance.
+            cards (list, optional): A list of card objects. Defaults to an empty list.
+
+        Returns:
+            None
+        """
         if len(cards) > 0:
             cards = p.make_card(cards)
         else:
@@ -18,7 +29,16 @@ class Player:
     def __str__(self):
         return "player_" + str(self.number)
 
-def dedupe(board):
+def dedupe(board: list):
+    """
+    Checks if there are any duplicates in the given list.
+
+    Parameters:
+        board (list): The list of elements to check for duplicates.
+
+    Returns:
+        bool: True if there are duplicates, False otherwise.
+    """
     duplicate = False
     c = Counter(board)
     for card in board:
@@ -40,7 +60,18 @@ def validate_card(check):
     return valid
 
 
-def convert_and_update(deck, cards):
+def convert_and_update(deck: p.Deck, cards: list):
+    """
+    Convert and update the deck with the given cards.
+
+    Parameters:
+        deck (Deck): The deck to be updated.
+        cards (list): The list of cards to be converted and added to the deck.
+
+    Returns:
+        tuple: A tuple containing the updated deck and the converted cards.
+
+    """
     if len(cards) == 0:
         return deck, cards
     else:
@@ -49,8 +80,21 @@ def convert_and_update(deck, cards):
             deck.update_deck(card)
         return deck, cards
 
+
 #####     SIMULATIONS     #####
-def evaluate_hand(hole_cards, flop=[], turn=[], river=[]):
+def evaluate_hand(hole_cards: list, flop=[], turn=[], river=[]):
+    """
+    Generate a hand evaluation based on the given hole cards and community cards.
+
+    Args:
+        hole_cards (list): A list of two strings representing the hole cards.
+        flop (list, optional): A list of three strings representing the flop cards. Defaults to an empty list.
+        turn (list, optional): A list of one string representing the turn card. Defaults to an empty list.
+        river (list, optional): A list of one string representing the river card. Defaults to an empty list.
+
+    Returns:
+        str or None: The evaluated hand as a string or None if the cards are insufficient for evaluation.
+    """
     board = flop + turn + river
     hand = None
     if len(hole_cards + board) < 5:
@@ -66,7 +110,15 @@ def evaluate_hand(hole_cards, flop=[], turn=[], river=[]):
 
 def score_game(contestants):
     #  TODO make this more elegant by functionizing repeated code.
-    """Application will determine the highest hand, including low and kicker for each player in player_list"""
+    """
+    A function that determines the winner of a game based on the hand values of the contestants.
+
+    Args:
+        contestants (list): A list of Player objects representing the contestants in the game.
+
+    Returns:
+        list: A list of Player objects with updated win counts.
+    """
     high = ['flush', 'straight', 'straight_flush']
     kick = ['4ok']
     hi_lo = ['boat']
@@ -128,7 +180,7 @@ def score_game(contestants):
             return contestants
 
 
-def simulation_one_player(hole, flop=[], turn=[], river=[], sims=100000):
+def simulation_one_player(hole: list, flop=[], turn=[], river=[], sims=100000):
     """
     Simulates a single player's hand in a poker game.
 
@@ -192,7 +244,7 @@ def simulation_one_player(hole, flop=[], turn=[], river=[], sims=100000):
     return sims, high_cards, pairs, two_pairs, trips, straights, flushes, boats, quads, straight_flushes
 
 
-def simulation_multiplayer(hole_one, hole_two=[], hole_three=[], hole_four=[], hole_five=[], hole_six=[],
+def simulation_multiplayer(hole_one: list, hole_two=[], hole_three=[], hole_four=[], hole_five=[], hole_six=[],
                            flop = [], turn = [], river = [], opponents=2, sims=10000):
     """
     Simulates a multiplayer poker game with the given parameters.
@@ -263,7 +315,17 @@ def simulation_multiplayer(hole_one, hole_two=[], hole_three=[], hole_four=[], h
 #  TODO for single and mult: find and return most likely hand.  Return number of outs and odds.
 
 #####     MATH     #####
-def percent(hits, sims):
+def percent(hits: int, sims: int):
+    """
+    Calculate the percentage of hits out of the total number of simulations.
+
+    Parameters:
+    - hits (int): The number of hits.
+    - sims (int): The total number of simulations.
+
+    Returns:
+    - percent (int): The percentage of hits rounded to the nearest whole number.
+    """
     percent = round((hits / sims) * 100,0)
     return percent
 

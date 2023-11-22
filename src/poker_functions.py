@@ -25,6 +25,16 @@ HAND_REGISTRY = []
 @dataclass
 class Card:
     def __init__(self, card_str):
+        """
+        Initializes a new instance of the Card class.
+
+        Parameters:
+            card_str (str): A string representing a card, with the rank as the first character and the suit as the
+            second character.
+
+        Returns:
+            None
+        """
         self.rank = str(card_str[0])
         self.suit = card_str[1]
         self.name = self.rank + self.suit
@@ -131,7 +141,7 @@ def register(func):
     HAND_REGISTRY.append(func)
     return func
 
-def make_card(input_list):
+def make_card(input_list: list):
     """Input_list is either a list of Card objects or string Objects.  If Cards, return the cards.
       If string, convert to Card and return"""
     if len(input_list) == 0:
@@ -144,6 +154,12 @@ def make_card(input_list):
 
 
 def generate_deck():
+    """
+    Generates a deck of cards.
+
+    Returns:
+        Deck: A deck of cards.
+    """
     deck = []
     for rank in ranks:
         for suit in suits:
@@ -156,7 +172,17 @@ def generate_deck():
 
 #####     POKER     #####
 def find_multiple(hand, board, n=2):
-    """Is there a pair, three of a kind, four of a kind/?"""
+    """
+    Find a multiple of cards in the given hand and board.
+
+    Args:
+        hand (List[str]): The cards in the player's hand.
+        board (List[str]): The cards on the board.
+        n (int, optional): The number of cards to find a multiple of. Defaults to 2.
+
+    Returns:
+        Hand or bool: The multiple hand if found, False otherwise.
+    """
     hand = make_card(hand)
     board = make_card(board)
     multiple = False
@@ -319,6 +345,16 @@ def find_straight(hand, board):
 
 @register
 def find_trips(hand, board):
+    """
+    Find Three-of-a-kind in a hand and board combination.
+
+    Args:
+        hand (list): The hand of cards.
+        board (list): The cards on the board.
+
+    Returns:
+        list: A list of trips found in the hand and board combination.
+    """
     trips = find_multiple(hand, board, n=3)
     return trips
 
@@ -355,6 +391,18 @@ def find_pair(hand, board):
 
 @register
 def find_high_card(hand, board):
+    """
+    A function to find the high card in a hand and board.
+
+    Parameters:
+    - hand (list): A list of cards representing the player's hand.
+    - board (list): A list of cards representing the community board cards.
+
+    Returns:
+    - high_card_hand (Hand): An object representing the high card hand.
+
+    This function takes a player's hand and the community board cards and finds the highest card value in the combined hand. It then creates a Hand object with the high card value as the main value, the second highest card value as the low value, and the third highest card value as the kicker. The function returns the created Hand object representing the high card hand.
+    """
     hand = make_card(hand)
     board = make_card(board)
     total_hand = hand + board

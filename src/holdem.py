@@ -1,3 +1,9 @@
+##############  IMPORTANT  ##############
+# This module is effectively depricated and will be removed in the future. #
+# Please use the 'sim_results.py' module instead. #
+# The command-line interface is no longer supported. #
+##############  IMPORTANT  ##############
+
 import sys
 import src.simulation as s
 import argparse
